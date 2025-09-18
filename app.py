@@ -30,18 +30,24 @@ def author():
                 <a href="/web">web</a>
             </body>
         </html>""" 
+
 @app.route('/lab1/image')
 def image():
-    path = url_for("static", filename="leon.jpg")
+    image_path = url_for("static", filename="leon.jpg")
+    css_path = url_for("static", filename="lab1.css")
     return '''
 <!doctype html>
 <html>
+    <head>
+        <link rel="stylesheet" href="''' + css_path + '''">
+    </head>
     <body>
         <h1>Леон</h1>
-        <img src="''' + path + ''' ">
+        <img src="''' + image_path + '''" alt="Леон">
     </body>
 </html>
 '''
+
 count=0
 @app.route('/counter')
 def counter():
@@ -62,9 +68,11 @@ def counter():
     </body>
 </html>
 '''
+
 @app.route("/info")
 def info():
     return redirect("/author")
+
 @app.route("/lab1/created")
 def created():
     return '''
