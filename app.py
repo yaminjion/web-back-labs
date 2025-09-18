@@ -54,7 +54,7 @@ Werkzeug, а также шаблонизатор Jinja2. Относится к �
 </html>
 '''
 
-# Страницы с кодами ответов HTTP
+
 @app.route('/400')
 def bad_request():
     return '''
@@ -253,4 +253,24 @@ def created():
 
 @app.errorhandler(404)
 def not_found(err):
-    return "нет такой страницы", 404
+    css_path = url_for("static", filename="error.css")
+    image_path = url_for("static", filename="apple.jpg")
+    return f'''
+<!doctype html>
+<html>
+    <head>
+        <title>404 - Страница не найдена</title>
+        <link rel="stylesheet" href="{css_path}">
+    </head>
+    <body>
+        <div class="error-container">
+            <h1>404</h1>
+            <h2>Не переживай</h2>
+            <img src="{image_path}" alt="мяу" class="error-image">
+            <p>Сейчас на вертолете прилетил Крис Редфилд</p>
+            <p>Он скинет ракетницу</p>
+            <a href="/" class="home-link">И все взорвется</a>
+        </div>
+    </body>
+</html>
+''', 404
