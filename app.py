@@ -1,6 +1,9 @@
 from flask import Flask, url_for, request, redirect
 import datetime
+
 app = Flask(__name__)
+
+count = 0
 
 @app.route("/")
 @app.route("/index")
@@ -45,15 +48,33 @@ def lab1():
 программирования Python, использующий набор инструментов
 Werkzeug, а также шаблонизатор Jinja2. Относится к категории так
 называемых микрофреймворков — минималистичных каркасов
-
-веб-приложений, сознательно предоставляющих лишь самые ба-
-зовые возможности.</p>
+веб-приложений, сознательно предоставляющих лишь самые базовые возможности.</p>
         
         <a href="/">На главную</a>
+        
+        <h2>Список роутов</h2>
+        <ul>
+            <li><a href="/">Главная страница</a></li>
+            <li><a href="/index">Index (альтернативная главная)</a></li>
+            <li><a href="/400">400 - Bad Request</a></li>
+            <li><a href="/401">401 - Unauthorized</a></li>
+            <li><a href="/402">402 - Payment Required</a></li>
+            <li><a href="/403">403 - Forbidden</a></li>
+            <li><a href="/404">404 - Страница не найдена</a></li>
+            <li><a href="/405">405 - Method Not Allowed</a></li>
+            <li><a href="/418">418 - I'm a teapot</a></li>
+            <li><a href="/lab1/web">Web-сервер</a></li>
+            <li><a href="/lab1/author">Информация об авторе</a></li>
+            <li><a href="/lab1/image">Изображение</a></li>
+            <li><a href="/lab1/counter">Счетчик посещений</a></li>
+            <li><a href="/lab1/reset_counter">Сброс счетчика</a></li>
+            <li><a href="/lab1/info">Перенаправление (redirect)</a></li>
+            <li><a href="/lab1/created">201 - Created</a></li>
+            <li><a href="/lab1/error">Тест ошибки 500</a></li>
+        </ul>
     </body>
 </html>
 '''
-
 
 @app.route('/400')
 def bad_request():
@@ -157,12 +178,14 @@ def web():
         <html>
             <body>
                 <h1>web-сервер на flask</h1>
-                <a href="/author">author</a>
+                <a href="/lab1/author">author</a>
+                <br>
+                <a href="/">На главную</a>
             </body> 
         </html>""", 200, {
-            'X-сервер':'sample',
-            'Content-Type': 'text/plain; charset=utf-8'
-                          }
+            'X-Server': 'sample',
+            'Content-Type': 'text/html; charset=utf-8'
+        }
 
 @app.route("/lab1/author")
 def author():
@@ -176,9 +199,11 @@ def author():
                 <p>Студент: """ + name + """ </p>
                 <p>Группа: """ + group + """ </p>
                 <p>Факультет: """ + faculty + """ </p>
-                <a href="/web">web</a>
+                <a href="/lab1/web">web</a>
+                <br>
+                <a href="/">На главную</a>
             </body>
-        </html>""" 
+        </html>"""
 
 @app.route('/lab1/image')
 def image():
@@ -193,36 +218,39 @@ def image():
     <body>
         <h1>Леон</h1>
         <img src="''' + image_path + '''" alt="Леон">
+        <br>
+        <a href="/">На главную</a>
     </body>
 </html>
 '''
     return content, 200, {
-        'Content-Language': 'ru',  
-        'X-Umbrella-Corp': 'T-Virus Research Division',  
-        'X-Raccoon-City': 'Quarantine Zone',  
+        'Content-Language': 'ru',
+        'X-Umbrella-Corp': 'T-Virus Research Division',
+        'X-Raccoon-City': 'Quarantine Zone',
         'X-Server': 'sample',
         'Content-Type': 'text/html; charset=utf-8'
     }
 
-count=0
 @app.route('/lab1/counter')
 def counter():
     global count
-    count+=1
-    time=datetime.datetime.today()
-    url=request.url
+    count += 1
+    time = datetime.datetime.today()
+    url = request.url
     client_ip = request.remote_addr
     return '''
 <!doctype html>
 <html>
     <body>
-        Сколько раз вы сюда заходили: '''+ str(count) + '''
+        Сколько раз вы сюда заходили: ''' + str(count) + '''
         <hr>
         Дата и время:''' + str(time) + '''<br>
         Запрошенный адрес:''' + str(url) + '''<br>
         Ваш IP-адрес: ''' + str(client_ip) + '''<br>
         <hr>
-        <a href="/reset_counter">Сбросить счетчик</a>
+        <a href="/lab1/reset_counter">Сбросить счетчик</a>
+        <br>
+        <a href="/">На главную</a>
     </body>
 </html>
 '''
@@ -237,7 +265,9 @@ def reset_counter():
     <body>
         <h1>Счетчик сброшен!</h1>
         <p>Счетчик был обнулен.</p>
-        <a href="/counter">Вернуться к счетчику</a>
+        <a href="/lab1/counter">Вернуться к счетчику</a>
+        <br>
+        <a href="/">На главную</a>
     </body>
 </html>
 '''
@@ -254,6 +284,7 @@ def created():
     <body>
         <h1> Создано успешно </h1>
         <div><i> Что-то создано... </i></div>
+        <a href="/">На главную</a>
     </body>
 </html>
 ''', 201
@@ -277,23 +308,19 @@ def not_found(err):
             <p>Сейчас на вертолете прилетил Крис Редфилд</p>
             <p>Он скинет ракетницу</p>
             <a href="/" class="home-link">И все взорвется</a>
+            <br>
         </div>
     </body>
 </html>
 ''', 404
+
 @app.route("/lab1/error")
 def server_error():
-    """
-    Обработчик, который вызывает ошибку на сервере (деление на ноль)
-    """
-    result = 10 / 0  
+    result = 10 / 0
     return str(result)
 
 @app.errorhandler(500)
 def internal_server_error(err):
-    """
-    Перехватчик ошибки 500 (Internal Server Error)
-    """
     return '''
 <!doctype html>
 <html>
