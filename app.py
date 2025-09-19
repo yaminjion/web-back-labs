@@ -184,7 +184,7 @@ def author():
 def image():
     image_path = url_for("static", filename="leon.jpg")
     css_path = url_for("static", filename="lab1.css")
-    return '''
+    content = '''
 <!doctype html>
 <html>
     <head>
@@ -196,6 +196,13 @@ def image():
     </body>
 </html>
 '''
+    return content, 200, {
+        'Content-Language': 'ru',  
+        'X-Umbrella-Corp': 'T-Virus Research Division',  
+        'X-Raccoon-City': 'Quarantine Zone',  
+        'X-Server': 'sample',
+        'Content-Type': 'text/html; charset=utf-8'
+    }
 
 count=0
 @app.route('/lab1/counter')
