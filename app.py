@@ -1,5 +1,7 @@
 from flask import Flask, url_for, request, redirect
 import datetime
+from collections import deque
+import threading
 
 app = Flask(__name__)
 
@@ -289,10 +291,26 @@ def created():
 </html>
 ''', 201
 
+access_log = deque(maxlen=100)
+log_lock = threading.Lock()
+
 @app.errorhandler(404)
 def not_found(err):
+    user_ip = request.remote_addr
+    access_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    requested_url = request.url
+    
+    with log_lock:
+        access_log.append({
+            'ip': user_ip,
+            'date': access_date,
+            'url': requested_url,
+            'user_agent': request.user_agent.string
+        })
+    
     css_path = url_for("static", filename="error.css")
     image_path = url_for("static", filename="apple.jpg")
+    
     return f'''
 <!doctype html>
 <html>
@@ -308,11 +326,46 @@ def not_found(err):
             <p>Сейчас на вертолете прилетил Крис Редфилд</p>
             <p>Он скинет ракетницу</p>
             <a href="/" class="home-link">И все взорвется</a>
-            <br>
+            
+            <!-- Информация о запросе -->
+            <div class="info-section">
+                <h3>Информация о запросе:</h3>
+                <p><strong>IP-адрес:</strong> {user_ip}</p>
+                <p><strong>Дата и время:</strong> {access_date}</p>
+                <p><strong>Запрошенный URL:</strong> {requested_url}</p>
+                <p><strong>Вернуться на:</strong> <a href="/" style="color: #cccccc; text-decoration: underline;">Главную страницу</a></p>
+            </div>
+            
+            <!-- История обращений -->
+            <div class="log-section">
+                <h3>История обращений:</h3>
+                {generate_log_html()}
+            </div>
         </div>
     </body>
 </html>
 ''', 404
+
+def generate_log_html():
+    """Генерирует HTML для отображения лога обращений"""
+    with log_lock:
+        logs = list(access_log)
+    
+    if not logs:
+        return "<p>Лог пуст</p>"
+    
+    log_html = []
+    for log in reversed(logs):
+        log_html.append(f'''
+        <div class="log-entry">
+            <p><strong>IP:</strong> {log['ip']} | 
+               <strong>Дата:</strong> {log['date']}</p>
+            <p><strong>URL:</strong> {log['url']}</p>
+            <p><strong>Браузер:</strong> {log['user_agent'][:80]}...</p>
+        </div>
+        ''')
+    
+    return ''.join(log_html)
 
 @app.route("/lab1/error")
 def server_error():
