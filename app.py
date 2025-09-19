@@ -274,3 +274,29 @@ def not_found(err):
     </body>
 </html>
 ''', 404
+@app.route("/lab1/error")
+def server_error():
+    """
+    Обработчик, который вызывает ошибку на сервере (деление на ноль)
+    """
+    result = 10 / 0  
+    return str(result)
+
+@app.errorhandler(500)
+def internal_server_error(err):
+    """
+    Перехватчик ошибки 500 (Internal Server Error)
+    """
+    return '''
+<!doctype html>
+<html>
+    <head>
+        <title>500 - Ошибка сервера</title>
+    </head>
+    <body>
+        <h1>500 - Внутренняя ошибка сервера</h1>
+        <p>На сервере произошла непредвиденная ошибка.</p>
+        <a href="/">На главную</a>
+    </body>
+</html>
+''', 500
