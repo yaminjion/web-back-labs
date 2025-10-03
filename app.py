@@ -25,6 +25,7 @@ def index():
             <nav>
                 <ul>
                     <li><a href="/lab1">Первая лабораторная</a></li>
+                    <li><a href="/lab2/">Вторая лабораторная</a></li>
                 </ul>
             </nav>
         </main>
@@ -77,7 +78,41 @@ Werkzeug, а также шаблонизатор Jinja2. Относится к �
     </body>
 </html>
 '''
-
+@app.route('/lab2/')
+def lab2():
+    return '''
+<!doctype html>
+<html>
+    <head>
+        <title>Лабораторная работа 2</title>
+    </head>
+    <body>
+        <a href="/">На главную</a>
+        
+        <h1>Лабораторная работа 2</h1>
+        
+        <h2>Список всех адресов:</h2>
+        <ul>
+            <li><a href="/lab2/a">/lab2/a (без слэша)</a></li>
+            <li><a href="/lab2/a/">/lab2/a/ (со слэшем)</a></li>
+            <li><a href="/lab2/flowers">/lab2/flowers - Все цветы</a></li>
+            <li><a href="/lab2/flowers/0">/lab2/flowers/0 - Цветок с ID 0</a></li>
+            <li><a href="/lab2/flowers/1">/lab2/flowers/1 - Цветок с ID 1</a></li>
+            <li><a href="/lab2/flowers/2">/lab2/flowers/2 - Цветок с ID 2</a></li>
+            <li><a href="/lab2/flowers/3">/lab2/flowers/3 - Цветок с ID 3</a></li>
+            <li><a href="/lab2/add_flower_form">/lab2/add_flower_form - Форма добавления цветка</a></li>
+            <li><a href="/lab2/clear_flowers">/lab2/clear_flowers - Очистка списка цветов</a></li>
+            <li><a href="/lab2/example">/lab2/example - Пример шаблона</a></li>
+            <li><a href="/lab2/filters">/lab2/filters - Фильтры Jinja2</a></li>
+            <li><a href="/lab2/calc/">/lab2/calc/ - Калькулятор (по умолчанию)</a></li>
+            <li><a href="/lab2/calc/5">/lab2/calc/5 - Калькулятор с одним числом</a></li>
+            <li><a href="/lab2/calc/10/3">/lab2/calc/10/3 - Калькулятор с двумя числами</a></li>
+            <li><a href="/lab2/books/">/lab2/books/ - Список книг</a></li>
+            <li><a href="/lab2/objects/">/lab2/objects/ - Галерея объектов</a></li>
+        </ul>
+    </body>
+</html>
+'''
 @app.route('/400')
 def bad_request():
     return '''
@@ -390,14 +425,32 @@ def internal_server_error(err):
 
 @app.route('/lab2/a')
 def a():
-    return 'без слэша'
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <p>без слэша</p>
+        <a href="/">На главную</a>
+    </body>
+</html>
+'''
 
 @app.route('/lab2/a/')
 def a2():
-    return 'со слэшем'
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <p>со слэшем</p>
+        <a href="/">На главную</a>
+    </body>
+</html>
+'''
 
 flower_list = ['роза', 'тюльпан', 'незабудка', 'ромашка']
-
+def get_default_flowers():
+    """Возвращает список цветов по умолчанию"""
+    return ['роза', 'тюльпан', 'незабудка', 'ромашка']
 @app.route('/lab2/flowers/<int:flower_id>')
 def flowers(flower_id):
     if flower_id >= len(flower_list):
@@ -415,6 +468,7 @@ def flowers(flower_id):
         <p><strong>ID:</strong> {flower_id}</p>
         <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
         <p><a href="/lab2/add_flower_form">Добавить новый цветок</a></p>
+        <a href="/">На главную</a>
     </body>
 </html>
 '''
@@ -426,12 +480,13 @@ def add_flower_by_url(name):
 <!doctype html>
 <html>
     <body>
-    <h1>Добавлен цветок</h1>
-    <p><strong>Название нового цветка:</strong> {name}</p>
-    <p><strong>Всего цветов:</strong> {len(flower_list)}</p>
-    <p><strong>Полный список:</strong> {', '.join(flower_list)}</p>
-    <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
-    <p><a href="/lab2/add_flower_form">Добавить еще один цветок</a></p>
+        <a href="/">На главную</a>
+        <h1>Добавлен цветок</h1>
+        <p><strong>Название нового цветка:</strong> {name}</p>
+        <p><strong>Всего цветов:</strong> {len(flower_list)}</p>
+        <p><strong>Полный список:</strong> {', '.join(flower_list)}</p>
+        <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+        <p><a href="/lab2/add_flower_form">Добавить еще один цветок</a></p>
     </body>
 </html>
 '''
@@ -447,12 +502,13 @@ def add_flower_from_form():
 <!doctype html>
 <html>
     <body>
-    <h1>Добавлен цветок</h1>
-    <p><strong>Название нового цветка:</strong> {name}</p>
-    <p><strong>Всего цветов:</strong> {len(flower_list)}</p>
-    <p><strong>Полный список:</strong> {', '.join(flower_list)}</p>
-    <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
-    <p><a href="/lab2/add_flower_form">Добавить еще один цветок</a></p>
+        <a href="/">На главную</a>
+        <h1>Добавлен цветок</h1>
+        <p><strong>Название нового цветка:</strong> {name}</p>
+        <p><strong>Всего цветов:</strong> {len(flower_list)}</p>
+        <p><strong>Полный список:</strong> {', '.join(flower_list)}</p>
+        <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+        <p><a href="/lab2/add_flower_form">Добавить еще один цветок</a></p>
     </body>
 </html>
 '''
@@ -466,6 +522,7 @@ def all_flowers():
         <title>Все цветы</title>
     </head>
     <body>
+        <a href="/">На главную</a>
         <h1>Список всех цветов</h1>
         <p><strong>Общее количество цветов:</strong> {len(flower_list)}</p>
         <ul>
@@ -484,6 +541,7 @@ def clear_flowers():
 <!doctype html>
 <html>
     <body>
+        <a href="/">На главную</a>
         <h1>Список цветов очищен</h1>
         <p>Все цветы были удалены из списка.</p>
         <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
@@ -498,6 +556,7 @@ def add_flower_form():
 <!doctype html>
 <html>
     <body>
+        <a href="/">На главную</a>
         <h1>Добавить новый цветок</h1>
         <form action="/lab2/add_flower/" method="get">
             <label for="name">Название цветка:</label>
@@ -508,6 +567,7 @@ def add_flower_form():
     </body>
 </html>
 '''
+
 @app.route('/lab2/example')
 def example():
     name = 'Елена Минько'
@@ -526,9 +586,6 @@ def example():
                          group=group, 
                          course=course,
                          fruits=fruits)
-@app.route('/lab2/')
-def lab2():
-    return render_template('lab2.html')
 
 @app.route('/lab2/filters')
 def filters():
@@ -569,6 +626,7 @@ def calc_two_numbers(a, b):
         </style>
     </head>
     <body>
+        
         <h1>Расчёт с параметрами:</h1>
         <div class="operations">
             <p>{a} + {b} = {addition}</p>
@@ -576,6 +634,7 @@ def calc_two_numbers(a, b):
             <p>{a} × {b} = {multiplication}</p>
             <p>{a} / {b} = {division}</p>
             <p>{a}<sup>{b}</sup> = {power}</p>
+            <a href="/">На главную</a>
         </div>
         <p><a href="/lab2/calc/">Вернуться к значениям по умолчанию (1/1)</a></p>
     </body>
@@ -602,6 +661,7 @@ books = [
 @app.route('/lab2/books/')
 def books_list():
     return render_template('books.html', books=books)
+
 # Данные по объектам из фото
 objects = [
     {'name': 'Ведьмы', 'description': 'Мистические существа', 'image': 'ведьмы.jpg'},
