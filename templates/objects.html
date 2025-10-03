@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Объекты</title>
+    <style>
+        body { margin: 20px; background: #fff; font-family: Arial; }
+        h1 { color: #ff69b4; text-align: center; }
+        .objects { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .item { background: #fff; border: 2px solid #ff69b4; border-radius: 10px; padding: 10px; text-align: center; }
+        .item img { width: 100px; height: 100px; object-fit: cover; border-radius: 5px; }
+        .name { color: #ff1493; font-weight: bold; margin: 5px 0; }
+        .desc { color: #333; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Объекты</h1>
+    <div class="objects">
+        {% for obj in objects %}
+        <div class="item">
+            <img src="{{ url_for('static', filename=obj.image) }}" alt="{{ obj.name }}">
+            <div class="name">{{ obj.name }}</div>
+            <div class="desc">{{ obj.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

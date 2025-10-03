@@ -602,3 +602,30 @@ books = [
 @app.route('/lab2/books/')
 def books_list():
     return render_template('books.html', books=books)
+# Данные по объектам из фото
+objects = [
+    {'name': 'Ведьмы', 'description': 'Мистические существа', 'image': 'ведьмы.jpg'},
+    {'name': 'веселушки', 'description': 'Веселые персонажи', 'image': 'веселушки.jpg'},
+    {'name': 'весна', 'description': 'Весеннее время года', 'image': 'весна.jpg'},
+    {'name': 'вместе', 'description': 'Дружная компания', 'image': 'вместе.jpg'},
+    {'name': 'головы', 'description': 'Изображения голов', 'image': 'головы.jpg'},
+    {'name': 'Гяру', 'description': 'Японский стиль моды', 'image': 'гяру.jpg'},
+    {'name': 'зайчик', 'description': 'Милый кролик', 'image': 'зайчик.jpg'},
+    {'name': 'зима', 'description': 'Зимнее время года', 'image': 'зима.jpg'},
+    {'name': 'кот', 'description': 'Домашний питомец', 'image': 'кот.jpg'},
+    {'name': 'котики', 'description': 'Милые котята', 'image': 'котики.jpg'},
+    {'name': 'Мику', 'description': 'Вокалоид Хацунэ Мику', 'image': 'мику.jpg'},
+    {'name': 'няя', 'description': 'Аниме персонаж', 'image': 'няя.jpg'},
+    {'name': 'очкарики', 'description': 'Персонажи в очках', 'image': 'очкарики.jpg'},
+    {'name': 'река', 'description': 'Водный поток', 'image': 'река.jpg'},
+    {'name': 'рин и лен', 'description': 'Вокалоиды Кагамине', 'image': 'рин и лен.jpg'},
+    {'name': 'Рыжая', 'description': 'Рыжеволосая девушка', 'image': 'рыжая.jpg'},
+    {'name': 'фото', 'description': 'Фотографии', 'image': 'фото.jpg'},
+    {'name': 'художница', 'description': 'Девушка-художник', 'image': 'художница.jpg'},
+    {'name': 'циклопы', 'description': 'Существа с одним глазом', 'image': 'циклопы.jpg'},
+    {'name': 'чай', 'description': 'Напиток', 'image': 'чай.jpg'}
+]
+
+@app.route('/lab2/objects/')
+def objects_list():
+    return render_template('objects.html', objects=objects)
