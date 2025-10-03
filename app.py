@@ -2,7 +2,6 @@ from flask import Flask, url_for, request, redirect, abort, render_template
 import datetime
 from collections import deque
 import threading
-
 app = Flask(__name__)
 
 count = 0
