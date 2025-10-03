@@ -397,26 +397,117 @@ def a2():
     return 'со слэшем'
 
 flower_list = ['роза', 'тюльпан', 'незабудка', 'ромашка']
+
 @app.route('/lab2/flowers/<int:flower_id>')
 def flowers(flower_id):
     if flower_id >= len(flower_list):
         abort(404)
     else:
-        return "цветок:" + flower_list[flower_id]
+        return f'''
+<!doctype html>
+<html>
+    <head>
+        <title>Информация о цветке</title>
+    </head>
+    <body>
+        <h1>Информация о цветке</h1>
+        <p><strong>Цветок:</strong> {flower_list[flower_id]}</p>
+        <p><strong>ID:</strong> {flower_id}</p>
+        <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+        <p><a href="/lab2/add_flower_form">Добавить новый цветок</a></p>
+    </body>
+</html>
+'''
+
 @app.route('/lab2/add_flower/<name>')
-def add_flower(name):
+def add_flower_by_url(name):
     flower_list.append(name)
     return f'''
 <!doctype html>
 <html>
     <body>
-    <h1> Добавлен цветок </h1>
-    <p> Название нового цветка:  {name} </p>
-    <p> Всего цветов: {len(flower_list)} </p>
-    <p> Полный список: {flower_list} </p>
+    <h1>Добавлен цветок</h1>
+    <p><strong>Название нового цветка:</strong> {name}</p>
+    <p><strong>Всего цветов:</strong> {len(flower_list)}</p>
+    <p><strong>Полный список:</strong> {', '.join(flower_list)}</p>
+    <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+    <p><a href="/lab2/add_flower_form">Добавить еще один цветок</a></p>
     </body>
 </html>
-''' 
+'''
+
+@app.route('/lab2/add_flower/')
+def add_flower_from_form():
+    name = request.args.get('name')
+    if not name:
+        abort(400, "вы не задали имя цветка")
+    
+    flower_list.append(name)
+    return f'''
+<!doctype html>
+<html>
+    <body>
+    <h1>Добавлен цветок</h1>
+    <p><strong>Название нового цветка:</strong> {name}</p>
+    <p><strong>Всего цветов:</strong> {len(flower_list)}</p>
+    <p><strong>Полный список:</strong> {', '.join(flower_list)}</p>
+    <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+    <p><a href="/lab2/add_flower_form">Добавить еще один цветок</a></p>
+    </body>
+</html>
+'''
+
+@app.route('/lab2/flowers')
+def all_flowers():
+    return f'''
+<!doctype html>
+<html>
+    <head>
+        <title>Все цветы</title>
+    </head>
+    <body>
+        <h1>Список всех цветов</h1>
+        <p><strong>Общее количество цветов:</strong> {len(flower_list)}</p>
+        <ul>
+            {"".join([f'<li>{i}. {flower}</li>' for i, flower in enumerate(flower_list)])}
+        </ul>
+        <p><a href="/lab2/clear_flowers">Очистить список цветов</a></p>
+        <p><a href="/lab2/add_flower_form">Добавить новый цветок</a></p>
+    </body>
+</html>
+'''
+
+@app.route('/lab2/clear_flowers')
+def clear_flowers():
+    flower_list.clear()
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>Список цветов очищен</h1>
+        <p>Все цветы были удалены из списка.</p>
+        <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+        <p><a href="/lab2/add_flower_form">Добавить новый цветок</a></p>
+    </body>
+</html>
+'''
+
+@app.route('/lab2/add_flower_form')
+def add_flower_form():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>Добавить новый цветок</h1>
+        <form action="/lab2/add_flower/" method="get">
+            <label for="name">Название цветка:</label>
+            <input type="text" id="name" name="name" required>
+            <button type="submit">Добавить</button>
+        </form>
+        <p><a href="/lab2/flowers">Посмотреть все цветы</a></p>
+    </body>
+</html>
+'''
 @app.route('/lab2/example')
 def example():
     name = 'Елена Минько'
