@@ -534,3 +534,52 @@ def lab2():
 def filters():
     phrase = " О <b> сколько</b> <u>нам</u> <i>открытий</i> чудных..."
     return render_template('filter.html', phrase=phrase)
+
+# Обработчик для /lab2/calc/ - перенаправляет на /lab2/calc/1/1
+@app.route('/lab2/calc/')
+def calc_default():
+    return redirect(url_for('calc_two_numbers', a=1, b=1))
+
+# Обработчик для /lab2/calc/<int:a> - перенаправляет на /lab2/calc/a/1
+@app.route('/lab2/calc/<int:a>')
+def calc_one_number(a):
+    return redirect(url_for('calc_two_numbers', a=a, b=1))
+
+# Основной обработчик для двух чисел
+@app.route('/lab2/calc/<int:a>/<int:b>')
+def calc_two_numbers(a, b):
+    # Выполняем математические операции
+    addition = a + b
+    subtraction = a - b
+    multiplication = a * b
+    division = a / b if b != 0 else "не определено (деление на ноль)"
+    power = a ** b
+    
+    # Формируем HTML ответ
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Математические операции</title>
+        <meta charset="utf-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; }}
+            .operations {{ background-color: #f5f5f5; padding: 20px; border-radius: 5px; }}
+            h1 {{ color: #333; }}
+        </style>
+    </head>
+    <body>
+        <h1>Расчёт с параметрами:</h1>
+        <div class="operations">
+            <p>{a} + {b} = {addition}</p>
+            <p>{a} - {b} = {subtraction}</p>
+            <p>{a} × {b} = {multiplication}</p>
+            <p>{a} / {b} = {division}</p>
+            <p>{a}<sup>{b}</sup> = {power}</p>
+        </div>
+        <p><a href="/lab2/calc/">Вернуться к значениям по умолчанию (1/1)</a></p>
+    </body>
+    </html>
+    """
+    
+    return html
