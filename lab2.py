@@ -224,13 +224,13 @@ def filters():
 # Обработчик для /lab2/calc/ - перенаправляет на /lab2/calc/1/1
 @lab2.route('/lab2/calc/')
 def calc_default():
-    return redirect(url_for('calc_two_numbers', a=1, b=1))
+    return redirect(url_for('lab2.calc_two_numbers', a=1, b=1))
 
 
 # Обработчик для /lab2/calc/<int:a> - перенаправляет на /lab2/calc/a/1
 @lab2.route('/lab2/calc/<int:a>')
 def calc_one_number(a):
-    return redirect(url_for('calc_two_numbers', a=a, b=1))
+    return redirect(url_for('lab2.calc_two_numbers', a=a, b=1))
 
 
 # Основной обработчик для двух чисел
