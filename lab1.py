@@ -63,6 +63,7 @@ def web():
             'Content-Type': 'text/html; charset=utf-8'
         }
 
+
 @lab1.route("/lab1/author")
 def author():
     name = "Минько Елена Михайловна"
@@ -80,6 +81,7 @@ def author():
                 <a href="/">На главную</a>
             </body>
         </html>"""
+
 
 @lab1.route('/lab1/image')
 def image():
@@ -107,6 +109,7 @@ def image():
         'Content-Type': 'text/html; charset=utf-8'
     }
 
+
 @lab1.route('/lab1/counter')
 def counter():
     global count
@@ -131,6 +134,7 @@ def counter():
 </html>
 '''
 
+
 @lab1.route('/lab1/reset_counter')
 def reset_counter():
     global count
@@ -148,9 +152,11 @@ def reset_counter():
 </html>
 '''
 
+
 @lab1.route("/lab1/info")
 def info():
     return redirect("/lab1/author")
+
 
 @lab1.route("/lab1/created")
 def created():

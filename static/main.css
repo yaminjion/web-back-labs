@@ -17,7 +17,7 @@ header {
     background: linear-gradient(to right, #1a1a1a 0%, #2a1a1a 100%);
     padding: 1.5rem 2rem;
     border-bottom: 3px solid #ff2e2e;
-    box-shadow: 0 4px 20px rgba(255, 46, 46, 0.2);
+    box-shadow: 0 4px 20px rgba(214, 61, 61, 0.2);
     border-radius: 12px 12px 0 0;
     width: 100%;
     max-width: 900px;
