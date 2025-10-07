@@ -51,7 +51,6 @@ footer {
     border: 1px solid #ffd1dc;
 }
 
-/* Дополнительные стили для улучшения внешнего вида */
 h1, h2, h3 {
     color: #d46a8b;
     text-shadow: 1px 1px 2px rgba(212, 106, 139, 0.1);
@@ -95,7 +94,7 @@ a:hover {
 }
 
 a:visited {
-    color: #a8526d; /* Более темный оттенок для посещенных ссылок */
+    color: #a8526d; 
 }
 
 
