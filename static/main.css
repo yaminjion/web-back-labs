@@ -108,3 +108,10 @@ header:hover, footer:hover {
     box-shadow: 0 8px 30px rgba(255, 158, 181, 0.2);
 }
 
+.error {
+    color: #d32f2f;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 4px;
+    display: block;
+}
