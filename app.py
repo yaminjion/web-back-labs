@@ -165,8 +165,8 @@ def not_found(err):
             'user_agent': request.user_agent.string
         })
     
-    css_path = url_for("static", filename="error.css")
-    image_path = url_for("static", filename="apple.jpg")
+    css_path = url_for("static", filename="lab1/error.css")
+    image_path = url_for("static", filename="lab1/apple.jpg")
     
     return f'''
 <!doctype html>

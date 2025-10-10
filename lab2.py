@@ -207,7 +207,7 @@ def example():
         {'name': 'апельсины', 'price': 80},
         {'name': 'мандарины', 'price': 95}, 
         {'name': 'манго', 'price': 321}]
-    return render_template('example.html', 
+    return render_template('lab2/example.html', 
                          name=name, 
                          lab_number=lab_number, 
                          group=group, 
@@ -218,7 +218,7 @@ def example():
 @lab2.route('/lab2/filters')
 def filters():
     phrase = " О <b> сколько</b> <u>нам</u> <i>открытий</i> чудных..."
-    return render_template('filter.html', phrase=phrase)
+    return render_template('lab2/filter.html', phrase=phrase)
 
 
 # Обработчик для /lab2/calc/ - перенаправляет на /lab2/calc/1/1
@@ -292,33 +292,33 @@ books = [
 # Обработчик для списка книг
 @lab2.route('/lab2/books/')
 def books_list():
-    return render_template('books.html', books=books)
+    return render_template('lab2/books.html', books=books)
 
 # Данные по объектам из фото
 objects = [
-    {'name': 'Ведьмы', 'description': 'Мистические существа', 'image': 'ведьмы.jpg'},
-    {'name': 'веселушки', 'description': 'Веселые персонажи', 'image': 'веселушки.jpg'},
-    {'name': 'весна', 'description': 'Весеннее время года', 'image': 'весна.jpg'},
-    {'name': 'вместе', 'description': 'Дружная компания', 'image': 'вместе.jpg'},
-    {'name': 'головы', 'description': 'Изображения голов', 'image': 'головы.jpg'},
-    {'name': 'Гяру', 'description': 'Японский стиль моды', 'image': 'гяру.jpg'},
-    {'name': 'зайчик', 'description': 'Милый кролик', 'image': 'зайчик.jpg'},
-    {'name': 'зима', 'description': 'Зимнее время года', 'image': 'зима.jpg'},
-    {'name': 'кот', 'description': 'Домашний питомец', 'image': 'кот.jpg'},
-    {'name': 'котики', 'description': 'Милые котята', 'image': 'котики.jpg'},
-    {'name': 'Мику', 'description': 'Вокалоид Хацунэ Мику', 'image': 'мику.jpg'},
-    {'name': 'няя', 'description': 'Аниме персонаж', 'image': 'няя.jpg'},
-    {'name': 'очкарики', 'description': 'Персонажи в очках', 'image': 'очкарики.jpg'},
-    {'name': 'река', 'description': 'Водный поток', 'image': 'река.jpg'},
-    {'name': 'рин и лен', 'description': 'Вокалоиды Кагамине', 'image': 'рин и лен.jpg'},
-    {'name': 'Рыжая', 'description': 'Рыжеволосая девушка', 'image': 'рыжая.jpg'},
-    {'name': 'фото', 'description': 'Фотографии', 'image': 'фото.jpg'},
-    {'name': 'художница', 'description': 'Девушка-художник', 'image': 'художница.jpg'},
-    {'name': 'циклопы', 'description': 'Существа с одним глазом', 'image': 'циклопы.jpg'},
-    {'name': 'чай', 'description': 'Напиток', 'image': 'чай.jpg'}
+    {'name': 'Ведьмы', 'description': 'Мистические существа', 'image': 'lab2/ведьмы.jpg'},
+    {'name': 'веселушки', 'description': 'Веселые персонажи', 'image': 'lab2/веселушки.jpg'},
+    {'name': 'весна', 'description': 'Весеннее время года', 'image': 'lab2/весна.jpg'},
+    {'name': 'вместе', 'description': 'Дружная компания', 'image': 'lab2/вместе.jpg'},
+    {'name': 'головы', 'description': 'Изображения голов', 'image': 'lab2/головы.jpg'},
+    {'name': 'Гяру', 'description': 'Японский стиль моды', 'image': 'lab2/гяру.jpg'},
+    {'name': 'зайчик', 'description': 'Милый кролик', 'image': 'lab2/зайчик.jpg'},
+    {'name': 'зима', 'description': 'Зимнее время года', 'image': 'lab2/зима.jpg'},
+    {'name': 'кот', 'description': 'Домашний питомец', 'image': 'lab2/кот.jpg'},
+    {'name': 'котики', 'description': 'Милые котята', 'image': 'lab2/котики.jpg'},
+    {'name': 'Мику', 'description': 'Вокалоид Хацунэ Мику', 'image': 'lab2/мику.jpg'},
+    {'name': 'няя', 'description': 'Аниме персонаж', 'image': 'lab2/няя.jpg'},
+    {'name': 'очкарики', 'description': 'Персонажи в очках', 'image': 'lab2/очкарики.jpg'},
+    {'name': 'река', 'description': 'Водный поток', 'image': 'lab2/река.jpg'},
+    {'name': 'рин и лен', 'description': 'Вокалоиды Кагамине', 'image': 'lab2/рин и лен.jpg'},
+    {'name': 'Рыжая', 'description': 'Рыжеволосая девушка', 'image': 'lab2/рыжая.jpg'},
+    {'name': 'фото', 'description': 'Фотографии', 'image': 'lab2/фото.jpg'},
+    {'name': 'художница', 'description': 'Девушка-художник', 'image': 'lab2/художница.jpg'},
+    {'name': 'циклопы', 'description': 'Существа с одним глазом', 'image': 'lab2/циклопы.jpg'},
+    {'name': 'чай', 'description': 'Напиток', 'image': 'lab2/чай.jpg'}
 ]
 
 
 @lab2.route('/lab2/objects/')
 def objects_list():
-    return render_template('objects.html', objects=objects)
+    return render_template('lab2/objects.html', objects=objects)
