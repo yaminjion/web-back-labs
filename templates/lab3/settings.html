@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 3{% endblock %}
+{% block main %}
+    <h1>Настройки</h1>
+    <form>
+        <div>
+            <label class="label" for="color">Выберите цвет текста:</label>
+            <input type="color" id="color" name="color" value="{{ color or '#000000' }}">
+        </div>
+        
+        <div>
+            <label class="label" for="bg_color">Выберите цвет фона:</label>
+            <input type="color" id="bg_color" name="bg_color" value="{{ bg_color or '#ffffff' }}">
+        </div>
+        
+        <div>
+            <label class="label" for="font_size">Размер шрифта (px):</label>
+            <input type="number" id="font_size" name="font_size" value="{{ font_size or '16' }}" min="10" max="30">
+        </div>
+        
+        <div>
+            <label class="label">Стиль шрифта:</label>
+            <input type="radio" id="normal" name="font_style" value="normal" {% if font_style == 'normal' or not font_style %}checked{% endif %}>
+            <label for="normal">Обычный</label>
+            
+            <input type="radio" id="bold" name="font_style" value="bold" {% if font_style == 'bold' %}checked{% endif %}>
+            <label for="bold">Жирный</label>
+            
+            <input type="radio" id="italic" name="font_style" value="italic" {% if font_style == 'italic' %}checked{% endif %}>
+            <label for="italic">Курсив</label>
+            
+            <input type="radio" id="bold-italic" name="font_style" value="bold-italic" {% if font_style == 'bold-italic' %}checked{% endif %}>
+            <label for="bold-italic">Жирный курсив</label>
+        </div>
+        
+        <div>
+            <button type="submit">OK</button>
+        </div>
+    </form>
+{% endblock %}
