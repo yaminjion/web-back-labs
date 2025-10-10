@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+    <h1>Железнодорожный билет</h1>
+    
+    <div style="border: 2px solid #333; padding: 20px; max-width: 600px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2>ЖЕЛЕЗНОДОРОЖНЫЙ БИЛЕТ</h2>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Пассажир:</strong> {{ fio }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Тип билета:</strong> 
+            {% if age < 18 %}
+                Детский билет
+            {% else %}
+                Взрослый билет
+            {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Маршрут:</strong> {{ departure }} → {{ destination }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Дата поездки:</strong> {{ travel_date }}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Место:</strong> 
+            {% if shelf == 'lower' %}Нижняя полка
+            {% elif shelf == 'upper' %}Верхняя полка
+            {% elif shelf == 'upper-side' %}Верхняя боковая
+            {% elif shelf == 'lower-side' %}Нижняя боковая
+            {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <strong>Дополнительные услуги:</strong>
+            <ul>
+                {% if linen %}<li>Бельё</li>{% endif %}
+                {% if luggage %}<li>Багаж</li>{% endif %}
+                {% if insurance %}<li>Страховка</li>{% endif %}
+            </ul>
+        </div>
+        
+        <div style="border-top: 1px solid #333; padding-top: 15px;">
+            <h3>Стоимость: {{ price }} руб.</h3>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="/lab3/ticket">Оформить новый билет</a>
+    </div>
+{% endblock %}

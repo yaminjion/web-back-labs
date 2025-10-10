@@ -123,3 +123,93 @@ def settings():
                                         font_size=font_size, 
                                         font_style=font_style))
     return resp
+
+
+@lab3.route('/lab3/ticket')
+def ticket():
+    errors = {}
+    fio = request.args.get('fio')
+    shelf = request.args.get('shelf')
+    linen = request.args.get('linen') == 'on'
+    luggage = request.args.get('luggage') == 'on'
+    age = request.args.get('age')
+    departure = request.args.get('departure')
+    destination = request.args.get('destination')
+    travel_date = request.args.get('travel_date')
+    insurance = request.args.get('insurance') == 'on'
+    
+    return render_template('lab3/ticket.html', 
+                         fio=fio, shelf=shelf, linen=linen, luggage=luggage,
+                         age=age, departure=departure, destination=destination,
+                         travel_date=travel_date, insurance=insurance, errors=errors)
+
+@lab3.route('/lab3/ticket_result')
+def ticket_result():
+    errors = {}
+    
+    # Получаем данные из формы
+    fio = request.args.get('fio')
+    shelf = request.args.get('shelf')
+    linen = request.args.get('linen') == 'on'
+    luggage = request.args.get('luggage') == 'on'
+    age_str = request.args.get('age')
+    departure = request.args.get('departure')
+    destination = request.args.get('destination')
+    travel_date = request.args.get('travel_date')
+    insurance = request.args.get('insurance') == 'on'
+    
+    # Проверка на пустые поля
+    if not fio:
+        errors['fio'] = 'Заполните ФИО пассажира'
+    if not shelf:
+        errors['shelf'] = 'Выберите полку'
+    if not age_str:
+        errors['age'] = 'Заполните возраст'
+    if not departure:
+        errors['departure'] = 'Заполните пункт выезда'
+    if not destination:
+        errors['destination'] = 'Заполните пункт назначения'
+    if not travel_date:
+        errors['travel_date'] = 'Выберите дату поездки'
+    
+    # Проверка возраста
+    if age_str:
+        try:
+            age = int(age_str)
+            if age < 1 or age > 120:
+                errors['age'] = 'Возраст должен быть от 1 до 120 лет'
+        except ValueError:
+            errors['age'] = 'Возраст должен быть числом'
+    
+    # Если есть ошибки, возвращаем к форме
+    if errors:
+        return render_template('lab3/ticket.html', 
+                             fio=fio, shelf=shelf, linen=linen, luggage=luggage,
+                             age=age_str, departure=departure, destination=destination,
+                             travel_date=travel_date, insurance=insurance, errors=errors)
+    
+    age = int(age_str)
+    
+    # Расчет стоимости
+    if age < 18:
+        price = 700  # Детский билет
+    else:
+        price = 1000  # Взрослый билет
+    
+    # Доплаты
+    if shelf in ['lower', 'lower-side']:
+        price += 100  # Доплата за нижнюю полку
+    
+    if linen:
+        price += 75  # Бельё
+    
+    if luggage:
+        price += 250  # Багаж
+    
+    if insurance:
+        price += 150  # Страховка
+    
+    return render_template('lab3/ticket_result.html',
+                         fio=fio, shelf=shelf, linen=linen, luggage=luggage,
+                         age=age, departure=departure, destination=destination,
+                         travel_date=travel_date, insurance=insurance, price=price)
