@@ -2,11 +2,25 @@
 {% block lab %}Лабораторная работа 4{% endblock %}
 
 {% block main %}
+<style>
+    .error-message {
+        color: #d32f6b;
+        background-color: #ffebee;
+        border: 1px solid #d673a9;
+        border-radius: 4px;
+        padding: 10px 15px;
+        margin: 10px 0;
+        font-weight: bold;
+        font-style: italic;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
     {% if authorized %}
-        <h1> Добро пожаловать, {{login}}!</h1>
+        <h1>Добро пожаловать, {{ user_name }}!</h1>
         <div>
-            <form action="/lab4/logout" method="post">
-                <button>Выход</button>
+            <form action="{{ url_for('lab4.logout') }}" method="post">
+                <button type="submit">Выход</button>
             </form>
         </div>
     {% else %}
@@ -16,7 +30,7 @@
         <form method="post">
             <div>
                 <label for="login">Пользователь:</label>
-                <input type="text" id="login" name="login">
+                <input type="text" id="login" name="login" value="{{ login_value }}">
             </div>
             
             <div>
@@ -25,7 +39,7 @@
             </div>
             
             {% if error %}
-            <div style="color: red; margin: 10px 0;">{{ error }}</div>
+            <div class="error-message">{{ error }}</div>
             {% endif %}
             
             <div>
