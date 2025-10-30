@@ -139,6 +139,16 @@ users = [
     {"login": 'lena', 'password': '777', "name": "Елена Минько", "gender": "female"},
 ]
 
+def get_current_user():
+    login = session.get('login')
+    if not login:
+        return None
+    for user in users:
+        if user['login'] == login:
+            return user
+    session.clear()  
+    return None
+
 @lab4.route('/lab4/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -169,6 +179,104 @@ def login():
 def logout():
     session.pop('login', None)
     session.pop('user_name', None)
+    return redirect(url_for('lab4.login'))
+
+
+@lab4.route('/lab4/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'GET':
+        return render_template('lab4/register.html')
+
+    login = request.form.get('login', '').strip()
+    name = request.form.get('name', '').strip()
+    password = request.form.get('password', '')
+    confirm = request.form.get('confirm', '')
+
+
+    if not login:
+        return render_template('lab4/register.html', error="Логин не может быть пустым")
+    if not name:
+        return render_template('lab4/register.html', error="Имя не может быть пустым")
+    if not password:
+        return render_template('lab4/register.html', error="Пароль не может быть пустым")
+    if password != confirm:
+        return render_template('lab4/register.html', error="Пароли не совпадают")
+
+    for user in users:
+        if user['login'] == login:
+            return render_template('lab4/register.html', error="Пользователь с таким логином уже существует")
+
+
+    users.append({
+        "login": login,
+        "password": password,
+        "name": name,
+        "gender": "unknown"  
+    })
+
+    return redirect(url_for('lab4.login'))
+
+
+@lab4.route('/lab4/users')
+def users_list():
+    current_user = get_current_user()
+    if not current_user:
+        return redirect(url_for('lab4.login'))
+
+    return render_template('lab4/users.html', users=users, current_login=current_user['login'])
+
+
+@lab4.route('/lab4/edit', methods=['GET', 'POST'])
+def edit_profile():
+    current_user = get_current_user()
+    if not current_user:
+        return redirect(url_for('lab4.login'))
+
+    if request.method == 'GET':
+        return render_template('lab4/edit.html', user=current_user)
+
+
+    new_login = request.form.get('login', '').strip()
+    name = request.form.get('name', '').strip()
+    password = request.form.get('password', '')
+    confirm = request.form.get('confirm', '')
+
+
+    if not new_login:
+        return render_template('lab4/edit.html', user=current_user, error="Логин не может быть пустым")
+    if not name:
+        return render_template('lab4/edit.html', user=current_user, error="Имя не может быть пустым")
+
+
+    for user in users:
+        if user['login'] == new_login and user['login'] != current_user['login']:
+            return render_template('lab4/edit.html', user=current_user, error="Логин уже занят")
+
+
+    if password or confirm:
+        if password != confirm:
+            return render_template('lab4/edit.html', user=current_user, error="Пароли не совпадают")
+        current_user['password'] = password
+
+
+    current_user['login'] = new_login
+    current_user['name'] = name
+
+
+    session['login'] = new_login
+    session['user_name'] = name
+
+    return redirect(url_for('lab4.users_list'))
+
+@lab4.route('/lab4/delete', methods=['POST'])
+def delete_self():
+    current_user = get_current_user()
+    if not current_user:
+        return redirect(url_for('lab4.login'))
+
+    global users
+    users = [u for u in users if u['login'] != current_user['login']]
+    session.clear()
     return redirect(url_for('lab4.login'))
 
 @lab4.route('/lab4/fridge', methods=['GET', 'POST'])
@@ -307,3 +415,4 @@ def grain_order():
                            grains=GRAIN_NAMES,
                            selected_grain=selected_grain,
                            weight_value=weight_value)
+

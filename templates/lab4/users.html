@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block lab %}Список пользователей{% endblock %}
+
+{% block main %}
+<h1>Пользователи</h1>
+<ul>
+{% for user in users %}
+    <li>
+        {{ user.name }} (логин: {{ user.login }})
+        {% if user.login == current_login %}
+            <strong>← это вы</strong>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+
+<div style="margin-top: 20px;">
+    <a href="{{ url_for('lab4.edit_profile') }}">Редактировать профиль</a> |
+    <form action="{{ url_for('lab4.delete_self') }}" method="post" style="display: inline;" onsubmit="return confirm('Удалить свой аккаунт?')">
+        <button type="submit">Удалить себя</button>
+    </form> |
+    <a href="{{ url_for('lab4.login') }}">Назад</a>
+</div>
+{% endblock %}
