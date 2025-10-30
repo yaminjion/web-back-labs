@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 4{% endblock %}
+
+{% block main %}
+<h1>Заказ зерна</h1>
+
+<form method="post">
+    <div>
+        <label>Тип зерна:</label><br>
+        {% for value, name in grains.items() %}
+            <label>
+                <input type="radio" name="grain" value="{{ value }}" 
+                       {% if selected_grain == value %}checked{% endif %}>
+                {{ name }}
+            </label><br>
+        {% endfor %}
+    </div>
+
+    <div style="margin-top: 15px;">
+        <label for="weight">Вес (в тоннах):</label>
+        <input type="text" id="weight" name="weight" value="{{ weight_value }}" placeholder="Например: 15">
+    </div>
+
+    <button type="submit" style="margin-top: 15px;">Оформить заказ</button>
+</form>
+
+{% if error %}
+    <div style="color: #d32f2f; background-color: #ffebee; padding: 12px; margin: 20px 0; border-radius: 6px; border: 1px solid #f44336;">
+        {{ error }}
+    </div>
+{% endif %}
+
+{% if success_message %}
+    <div style="color: #2e7d32; background-color: #e8f5e9; padding: 15px; margin: 20px 0; border-radius: 6px; border: 1px solid #a5d6a7;">
+        {{ success_message }}
+        {% if discount_applied %}
+            <br><small style="color: #1b5e20;">Скидка 10% за большой объём: {{ discount_amount|round(2) }} руб.</small>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

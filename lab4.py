@@ -214,3 +214,96 @@ def fridge():
                                temp_value=temp_value)
 
     return render_template('lab4/fridge.html', temp_value=temp_value)
+
+@lab4.route('/lab4/grain_order', methods=['GET', 'POST'])
+def grain_order():
+
+    PRICES = {
+        'barley': 12000,   
+        'oats': 8500,      
+        'wheat': 9000,     
+        'rye': 15000       
+    }
+
+
+    GRAIN_NAMES = {
+        'barley': 'ячмень',
+        'oats': 'овёс',
+        'wheat': 'пшеница',
+        'rye': 'рожь'
+    }
+
+    selected_grain = ''
+    weight_value = ''
+
+    if request.method == 'GET':
+        return render_template('lab4/grain_order.html', 
+                               grains=GRAIN_NAMES,
+                               selected_grain=selected_grain,
+                               weight_value=weight_value)
+
+
+    selected_grain = request.form.get('grain', '')
+    weight_value = request.form.get('weight', '').strip()
+
+    if not selected_grain or selected_grain not in PRICES:
+        return render_template('lab4/grain_order.html',
+                               error="Пожалуйста, выберите тип зерна",
+                               grains=GRAIN_NAMES,
+                               selected_grain=selected_grain,
+                               weight_value=weight_value)
+
+
+    if weight_value == '':
+        return render_template('lab4/grain_order.html',
+                               error="Вес не был указан",
+                               grains=GRAIN_NAMES,
+                               selected_grain=selected_grain,
+                               weight_value=weight_value)
+
+
+    try:
+        weight = float(weight_value)
+    except ValueError:
+        return render_template('lab4/grain_order.html',
+                               error="Вес должен быть числом",
+                               grains=GRAIN_NAMES,
+                               selected_grain=selected_grain,
+                               weight_value=weight_value)
+
+    if weight <= 0:
+        return render_template('lab4/grain_order.html',
+                               error="Вес должен быть больше 0",
+                               grains=GRAIN_NAMES,
+                               selected_grain=selected_grain,
+                               weight_value=weight_value)
+
+    if weight > 100:
+        return render_template('lab4/grain_order.html',
+                               error="Такого объёма сейчас нет в наличии",
+                               grains=GRAIN_NAMES,
+                               selected_grain=selected_grain,
+                               weight_value=weight_value)
+
+
+    price_per_ton = PRICES[selected_grain]
+    total = weight * price_per_ton
+    discount_applied = False
+    discount_amount = 0
+
+
+    if weight > 10:
+        discount_applied = True
+        discount_amount = total * 0.10
+        total -= discount_amount
+
+    grain_name = GRAIN_NAMES[selected_grain]
+    success_message = f"Заказ успешно сформирован. Вы заказали {grain_name}. Вес: {weight} т. Сумма к оплате: {total:,.2f} руб.".replace(',', ' ')
+
+    return render_template('lab4/grain_order.html',
+                           success_message=success_message,
+                           discount_applied=discount_applied,
+                           discount_amount=discount_amount,
+                           grains=GRAIN_NAMES,
+                           selected_grain=selected_grain,
+                           weight_value=weight_value)
