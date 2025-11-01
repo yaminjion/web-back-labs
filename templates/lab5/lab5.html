@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+<style>
+    .header-bar {
+        background-color: #d3d3d3;
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    .nav-container {
+        background-color: #f2b3c8;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 5px;
+    }
+    .nav-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .nav-buttons button {
+        padding: 8px 16px;
+        border: 1px solid #888;
+        border-radius: 4px;
+        background-color: #ffffff;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    .nav-buttons button:hover {
+        background-color: #ebd5df;
+    }
+    h1 {
+        margin-top: 20px;
+        font-size: 24px;
+    }
+    .user-info {
+        font-weight: bold;
+        color: #333;
+    }
+</style>
+
+<div class="header-bar">
+    WEB-программирование, часть 2. Лабораторная работа 5<br>
+</div>
+
+<h1>База знаний</h1>
+
+<div class="nav-container">
+    <div class="nav-buttons">
+        <button onclick="location.href='/lab5/login'">Войти</button>
+        <button onclick="location.href='/lab4/register'">Регистрация</button>
+        <button onclick="location.href='/lab4/list'">Список статей</button>
+        <button onclick="location.href='/lab4/create'">Создать статью</button>
+    </div>
+    <div class="user-info">
+        anonymous
+    </div>
+</div>
+{% endblock %}
