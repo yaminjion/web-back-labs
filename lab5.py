@@ -125,3 +125,31 @@ def create():
         db_close(conn, cur)
         print(f"Ошибка при создании статьи: {e}")
         return render_template('lab5/create_article.html', error="Ошибка при сохранении статьи")
+    
+
+@lab5.route('/lab5/list')
+def list_articles():
+
+    if 'login' not in session:
+        return redirect('/lab5/login')
+
+    login = session['login']
+    conn, cur = db_connect()
+
+    try:
+
+        cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        user = cur.fetchone()
+        if not user:
+            db_close(conn, cur)
+            return render_template('lab5/articles.html', error="Пользователь не найден")
+
+        cur.execute("SELECT * FROM articles WHERE user_id = %s;", (user['id'],))
+        articles = cur.fetchall()
+        db_close(conn, cur)
+
+        return render_template('lab5/articles.html', articles=articles)
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка при загрузке статей: {e}")
+        return render_template('lab5/articles.html', error="Ошибка при загрузке статей")

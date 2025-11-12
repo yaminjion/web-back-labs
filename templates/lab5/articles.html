@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+    <h1>Мои статьи</h1>
+
+    {% if error %}
+        <div style="color: red; margin-bottom: 15px;">
+            {{ error }}
+        </div>
+    {% elif articles %}
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            {% for article in articles %}
+                <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; background-color: #f9f9f9;">
+                    <h2>{{ article.title or '[Без названия]' }}</h2>
+                    <p style="white-space: pre-line;">{{ article.article_text }}</p>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        {% if article.is_favorite %}⭐ Избранное | {% endif %}
+                        {% if article.is_public %}🌐 Публичная | {% endif %}
+                        ❤️ Лайков: {{ article.likes }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>У вас пока нет ни одной статьи.</p>
+    {% endif %}
+
+    <p><a href="/lab5">← Вернуться в базу знаний</a></p>
+{% endblock %}
