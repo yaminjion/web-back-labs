@@ -57,7 +57,11 @@
         <button onclick="location.href='/lab5/create'">Создать статью</button>
     </div>
     <div class="user-info">
-        anonymous
+        {% if session.login %}
+            {{ session.login }}
+        {% else %}
+            anonymous
+        {% endif %}
     </div>
 </div>
 {% endblock %}
