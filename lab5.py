@@ -87,3 +87,41 @@ def login():
         db_close(conn, cur)
         print(f"Ошибка базы данных: {e}")
         return render_template('lab5/login.html', error=f"Ошибка базы данных: {e}")
+
+
+@lab5.route('/lab5/create', methods=['GET', 'POST'])
+def create():
+    if 'login' not in session:
+        return redirect('/lab5/login')
+
+    if request.method == 'GET':
+        return render_template('lab5/create_article.html')
+
+
+    title = request.form.get('title')
+    article_text = request.form.get('article_text')
+
+    login = session['login']
+
+    conn, cur = db_connect()
+
+    try:
+
+        cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        user = cur.fetchone()
+        if not user:
+            db_close(conn, cur)
+            return render_template('lab5/create_article.html', error="Пользователь не найден")
+
+
+        cur.execute("""
+            INSERT INTO articles (user_id, title, article_text, is_favorite, is_public, likes)
+            VALUES (%s, %s, %s, %s, %s, %s);
+        """, (user['id'], title, article_text, False, False, 0))
+
+        db_close(conn, cur)
+        return redirect('/lab5')  
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка при создании статьи: {e}")
+        return render_template('lab5/create_article.html', error="Ошибка при сохранении статьи")

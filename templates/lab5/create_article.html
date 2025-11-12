@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+    <h1>Создание статьи</h1>
+
+    {% if error %}
+        <div style="color: red; margin-bottom: 15px;">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <form action="/lab5/create" method="post">
+        <div style="margin-bottom: 15px;">
+            <label>
+                Заголовок:<br>
+                <input type="text" name="title" value="{{ request.form.title or '' }}" style="width: 100%; padding: 8px;">
+            </label>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>
+                Текст статьи:<br>
+                <textarea name="article_text" rows="10" style="width: 100%; padding: 8px;">{{ request.form.article_text or '' }}</textarea>
+            </label>
+        </div>
+        <button type="submit">Создать статью</button>
+    </form>
+
+    <p><a href="/lab5">← Вернуться в базу знаний</a></p>
+{% endblock %}
