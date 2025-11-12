@@ -46,7 +46,7 @@ def register():
             return render_template('lab5/register.html', error="Такой пользователь уже существует")
 
         hashed_password = generate_password_hash(password)
-        cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, hashed_password))
+        cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, password))
         db_close(conn, cur)
         return render_template('lab5/success.html', login=login)
     except Exception as e:
@@ -112,7 +112,6 @@ def create():
         if not user:
             db_close(conn, cur)
             return render_template('lab5/create_article.html', error="Пользователь не найден")
-
 
         cur.execute("""
             INSERT INTO articles (user_id, title, article_text, is_favorite, is_public, likes)
