@@ -195,3 +195,97 @@ def list_articles():
         db_close(conn, cur)
         print(f"Ошибка при загрузке статей: {e}")
         return render_template('lab5/articles.html', error="Ошибка при загрузке статей")
+    
+@lab5.route('/lab5/logout')
+def logout():
+    session.pop('login', None)
+    return redirect('/lab5/')
+
+@lab5.route('/lab5/edit/<int:article_id>', methods=['GET', 'POST'])
+def edit_article(article_id):
+    if 'login' not in session:
+        return redirect('/lab5/login')
+
+    login = session['login']
+    conn, cur = db_connect()
+    try:
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+
+        if db_type == 'postgres':
+            cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        else:
+            cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
+        user = cur.fetchone()
+        if not user:
+            db_close(conn, cur)
+            return redirect('/lab5/login')
+
+        if db_type == 'postgres':
+            cur.execute("SELECT * FROM articles WHERE id = %s AND user_id = %s;", (article_id, user['id']))
+        else:
+            cur.execute("SELECT * FROM articles WHERE id = ? AND user_id = ?;", (article_id, user['id']))
+        article = cur.fetchone()
+        if not article:
+            db_close(conn, cur)
+            return render_template('lab5/articles.html', error="Статья не найдена")
+
+        if request.method == 'GET':
+            db_close(conn, cur)
+            return render_template('lab5/edit_article.html', article=article)
+
+        title = request.form.get('title', '').strip()
+        article_text = request.form.get('article_text', '').strip()
+
+        if not title or not article_text:
+            db_close(conn, cur)
+            return render_template('lab5/edit_article.html', article=article, error="Название и текст не могут быть пустыми")
+
+        if db_type == 'postgres':
+            cur.execute("""
+                UPDATE articles SET title = %s, article_text = %s
+                WHERE id = %s AND user_id = %s;
+            """, (title, article_text, article_id, user['id']))
+        else:
+            cur.execute("""
+                UPDATE articles SET title = ?, article_text = ?
+                WHERE id = ? AND user_id = ?;
+            """, (title, article_text, article_id, user['id']))
+
+        db_close(conn, cur)
+        return redirect('/lab5/list')
+
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка при редактировании статьи: {e}")
+        return render_template('lab5/edit_article.html', article=article, error="Ошибка при сохранении")
+
+
+@lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
+def delete_article(article_id):
+    if 'login' not in session:
+        return redirect('/lab5/login')
+
+    login = session['login']
+    conn, cur = db_connect()
+    try:
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
+            cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
+        else:
+            cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
+        user = cur.fetchone()
+        if not user:
+            db_close(conn, cur)
+            return redirect('/lab5/login')
+
+        if db_type == 'postgres':
+            cur.execute("DELETE FROM articles WHERE id = %s AND user_id = %s;", (article_id, user['id']))
+        else:
+            cur.execute("DELETE FROM articles WHERE id = ? AND user_id = ?;", (article_id, user['id']))
+
+        db_close(conn, cur)
+        return redirect('/lab5/list')
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка при удалении статьи: {e}")
+        return redirect('/lab5/list')
