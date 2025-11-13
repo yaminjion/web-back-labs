@@ -11,6 +11,7 @@ lab5 = Blueprint('lab5', __name__)
 
 def db_connect():
     db_type = os.environ.get('DB_TYPE', 'postgres')
+    print(f"DEBUG: DB_TYPE = {db_type}") 
     if db_type == 'postgres':
         conn = psycopg2.connect(
             host='127.0.0.1',
@@ -22,6 +23,7 @@ def db_connect():
     else:
         dir_path = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.join(dir_path, 'database.db')
+        print(f"DEBUG: SQLite path = {db_path}")
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
@@ -157,7 +159,9 @@ def create():
     except Exception as e:
         db_close(conn, cur)
         print(f"Ошибка при создании статьи: {e}")
-        return render_template('lab5/create_article.html', error="Ошибка при сохранении статьи")
+        import traceback
+        print(f"Полный traceback: {traceback.format_exc()}")
+        return render_template('lab5/create_article.html', error=f"Ошибка при сохранении статьи: {str(e)}")
 
 
 @lab5.route('/lab5/list')
