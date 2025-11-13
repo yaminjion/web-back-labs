@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, session
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,12 +8,9 @@ import os
 lab5 = Blueprint('lab5', __name__)
 
 
-def get_db_type():
-    return current_app.config.get('DB_TYPE', 'postgres')
-
-
 def db_connect():
-    if get_db_type() == 'postgres':
+    db_type = os.environ.get('DB_TYPE', 'postgres')
+    if db_type == 'postgres':
         conn = psycopg2.connect(
             host='127.0.0.1',
             database='lena_minko_knowledge_base',
@@ -25,7 +22,7 @@ def db_connect():
         dir_path = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.join(dir_path, 'database.db')
         conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row  
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
     return conn, cur
 
@@ -54,7 +51,8 @@ def register():
 
     conn, cur = db_connect()
     try:
-        if get_db_type() == 'postgres':
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
             cur.execute("SELECT login FROM users WHERE login = %s;", (login,))
         else:
             cur.execute("SELECT login FROM users WHERE login = ?;", (login,))
@@ -64,7 +62,7 @@ def register():
             return render_template('lab5/register.html', error="Такой пользователь уже существует")
 
         hashed_password = generate_password_hash(password)
-        if get_db_type() == 'postgres':
+        if db_type == 'postgres':
             cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, hashed_password))
         else:
             cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, hashed_password))
@@ -90,7 +88,8 @@ def login():
 
     conn, cur = db_connect()
     try:
-        if get_db_type() == 'postgres':
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
             cur.execute("SELECT * FROM users WHERE login = %s;", (login_str,))
         else:
             cur.execute("SELECT * FROM users WHERE login = ?;", (login_str,))
@@ -130,7 +129,8 @@ def create():
     login = session['login']
     conn, cur = db_connect()
     try:
-        if get_db_type() == 'postgres':
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
             cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
         else:
             cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
@@ -140,7 +140,7 @@ def create():
             db_close(conn, cur)
             return render_template('lab5/create_article.html', error="Пользователь не найден")
 
-        if get_db_type() == 'postgres':
+        if db_type == 'postgres':
             cur.execute("""
                 INSERT INTO articles (user_id, title, article_text, is_favorite, is_public, likes)
                 VALUES (%s, %s, %s, %s, %s, %s);
@@ -167,7 +167,8 @@ def list_articles():
     login = session['login']
     conn, cur = db_connect()
     try:
-        if get_db_type() == 'postgres':
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
             cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
         else:
             cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
@@ -177,7 +178,7 @@ def list_articles():
             db_close(conn, cur)
             return render_template('lab5/articles.html', error="Пользователь не найден")
 
-        if get_db_type() == 'postgres':
+        if db_type == 'postgres':
             cur.execute("SELECT * FROM articles WHERE user_id = %s;", (user['id'],))
         else:
             cur.execute("SELECT * FROM articles WHERE user_id = ?;", (user['id'],))
