@@ -4,7 +4,8 @@ from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
-
+from dotenv import load_dotenv
+load_dotenv() 
 lab5 = Blueprint('lab5', __name__)
 
 
