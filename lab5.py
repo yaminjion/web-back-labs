@@ -157,7 +157,9 @@ def create():
     except Exception as e:
         db_close(conn, cur)
         print(f"Ошибка при создании статьи: {e}")
-        return render_template('lab5/create_article.html', error="Ошибка при сохранении статьи")
+        import traceback
+        print(f"Полный traceback: {traceback.format_exc()}")
+        return render_template('lab5/create_article.html', error=f"Ошибка при сохранении статьи: {str(e)}")
 
 
 @lab5.route('/lab5/list')
