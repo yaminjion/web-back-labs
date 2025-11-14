@@ -19,13 +19,14 @@
                         {% if article.is_public %}🌐 Публичная | {% endif %}
                         ❤️ Лайков: {{ article.likes }}
                     </div>
-                    <div style="margin-top: 12px; display: flex; gap: 10px; align-items: flex-start;">
+
+                    <div style="margin-top: 12px; display: flex; gap: 10px;">
                         <a href="{{ url_for('lab5.edit_article', article_id=article.id) }}"
-                        style="text-decoration: none; padding: 8px 16px; background-color: #4CAF50; color: white; border-radius: 4px; font-size: 14px; display: inline-block; line-height: 1.2;">
+                           style="text-decoration: none; padding: 8px 16px; background-color: #4CAF50; color: white; border-radius: 4px; font-size: 14px; display: inline-block; line-height: 1.2;">
                             Редактировать
                         </a>
                         <form method="post" action="{{ url_for('lab5.delete_article', article_id=article.id) }}"
-                            style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить статью?')">
+                              style="display: inline;" onsubmit="return confirm('Вы уверены, что хотите удалить статью?')">
                             <button type="submit"
                                     style="padding: 8px 16px; background-color: #f44336; color: white; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; line-height: 1.2;">
                                 Удалить

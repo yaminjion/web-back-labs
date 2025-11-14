@@ -48,9 +48,10 @@ def register():
 
     login = request.form.get('login')
     password = request.form.get('password')
+    name = request.form.get('name', '').strip()
 
-    if not login or not password:
-        return render_template('lab5/register.html', error='Заполните все поля')
+    if not login or not password or not name:
+        return render_template('lab5/register.html', error='Заполните все поля (включая имя)')
 
     conn, cur = db_connect()
     try:
@@ -66,9 +67,9 @@ def register():
 
         hashed_password = generate_password_hash(password)
         if db_type == 'postgres':
-            cur.execute("INSERT INTO users (login, password) VALUES (%s, %s);", (login, hashed_password))
+            cur.execute("INSERT INTO users (login, password, name) VALUES (%s, %s, %s);", (login, hashed_password, name))
         else:
-            cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (login, hashed_password))
+            cur.execute("INSERT INTO users (login, password, name) VALUES (?, ?, ?);", (login, hashed_password, name))
 
         db_close(conn, cur)
         return render_template('lab5/success.html', login=login)
@@ -76,7 +77,6 @@ def register():
         db_close(conn, cur)
         print(f"Ошибка базы данных: {e}")
         return render_template('lab5/register.html', error="Ошибка базы данных")
-
 
 @lab5.route('/lab5/login', methods=['GET', 'POST'])
 def login():
@@ -123,8 +123,10 @@ def create():
     if request.method == 'GET':
         return render_template('lab5/create_article.html')
 
-    title = request.form.get('title')
-    article_text = request.form.get('article_text')
+    title = request.form.get('title', '').strip()
+    article_text = request.form.get('article_text', '').strip()
+    is_favorite = bool(request.form.get('is_favorite'))
+    is_public = bool(request.form.get('is_public'))
 
     if not title or not article_text:
         return render_template('lab5/create_article.html', error="Название и текст статьи не должны быть пустыми")
@@ -137,7 +139,6 @@ def create():
             cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
         else:
             cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
-
         user = cur.fetchone()
         if not user:
             db_close(conn, cur)
@@ -147,22 +148,19 @@ def create():
             cur.execute("""
                 INSERT INTO articles (user_id, title, article_text, is_favorite, is_public, likes)
                 VALUES (%s, %s, %s, %s, %s, %s);
-            """, (user['id'], title, article_text, False, False, 0))
+            """, (user['id'], title, article_text, is_favorite, is_public, 0))
         else:
             cur.execute("""
                 INSERT INTO articles (user_id, title, article_text, is_favorite, is_public, likes)
                 VALUES (?, ?, ?, ?, ?, ?);
-            """, (user['id'], title, article_text, False, False, 0))
+            """, (user['id'], title, article_text, is_favorite, is_public, 0))
 
         db_close(conn, cur)
         return redirect('/lab5/list')
     except Exception as e:
         db_close(conn, cur)
         print(f"Ошибка при создании статьи: {e}")
-        import traceback
-        print(f"Полный traceback: {traceback.format_exc()}")
-        return render_template('lab5/create_article.html', error=f"Ошибка при сохранении статьи: {str(e)}")
-
+        return render_template('lab5/create_article.html', error="Ошибка при сохранении статьи")
 
 @lab5.route('/lab5/list')
 def list_articles():
@@ -177,16 +175,15 @@ def list_articles():
             cur.execute("SELECT id FROM users WHERE login = %s;", (login,))
         else:
             cur.execute("SELECT id FROM users WHERE login = ?;", (login,))
-
         user = cur.fetchone()
         if not user:
             db_close(conn, cur)
             return render_template('lab5/articles.html', error="Пользователь не найден")
 
         if db_type == 'postgres':
-            cur.execute("SELECT * FROM articles WHERE user_id = %s;", (user['id'],))
+            cur.execute("SELECT * FROM articles WHERE user_id = %s ORDER BY is_favorite DESC, id DESC;", (user['id'],))
         else:
-            cur.execute("SELECT * FROM articles WHERE user_id = ?;", (user['id'],))
+            cur.execute("SELECT * FROM articles WHERE user_id = ? ORDER BY is_favorite DESC, id DESC;", (user['id'],))
 
         articles = cur.fetchall()
         db_close(conn, cur)
@@ -227,7 +224,7 @@ def edit_article(article_id):
         article = cur.fetchone()
         if not article:
             db_close(conn, cur)
-            return render_template('lab5/articles.html', error="Статья не найдена")
+            return render_template('lab5/articles.html', error="Статья не найдена или недоступна")
 
         if request.method == 'GET':
             db_close(conn, cur)
@@ -235,21 +232,25 @@ def edit_article(article_id):
 
         title = request.form.get('title', '').strip()
         article_text = request.form.get('article_text', '').strip()
+        is_favorite = bool(request.form.get('is_favorite'))
+        is_public = bool(request.form.get('is_public'))
 
         if not title or not article_text:
             db_close(conn, cur)
-            return render_template('lab5/edit_article.html', article=article, error="Название и текст не могут быть пустыми")
+            return render_template('lab5/edit_article.html', article=article, error="Название и текст статьи не могут быть пустыми")
 
         if db_type == 'postgres':
             cur.execute("""
-                UPDATE articles SET title = %s, article_text = %s
+                UPDATE articles 
+                SET title = %s, article_text = %s, is_favorite = %s, is_public = %s 
                 WHERE id = %s AND user_id = %s;
-            """, (title, article_text, article_id, user['id']))
+            """, (title, article_text, is_favorite, is_public, article_id, user['id']))
         else:
             cur.execute("""
-                UPDATE articles SET title = ?, article_text = ?
+                UPDATE articles 
+                SET title = ?, article_text = ?, is_favorite = ?, is_public = ? 
                 WHERE id = ? AND user_id = ?;
-            """, (title, article_text, article_id, user['id']))
+            """, (title, article_text, is_favorite, is_public, article_id, user['id']))
 
         db_close(conn, cur)
         return redirect('/lab5/list')
@@ -257,8 +258,7 @@ def edit_article(article_id):
     except Exception as e:
         db_close(conn, cur)
         print(f"Ошибка при редактировании статьи: {e}")
-        return render_template('lab5/edit_article.html', article=article, error="Ошибка при сохранении")
-
+        return render_template('lab5/edit_article.html', article=article, error="Ошибка при сохранении статьи")
 
 @lab5.route('/lab5/delete/<int:article_id>', methods=['POST'])
 def delete_article(article_id):
@@ -289,3 +289,115 @@ def delete_article(article_id):
         db_close(conn, cur)
         print(f"Ошибка при удалении статьи: {e}")
         return redirect('/lab5/list')
+
+@lab5.route('/lab5/users')
+def users_list():
+    conn, cur = db_connect()
+    try:
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
+            cur.execute("SELECT login, name FROM users ORDER BY login;")
+        else:
+            cur.execute("SELECT login, name FROM users ORDER BY login;")
+        users = cur.fetchall()
+        db_close(conn, cur)
+        return render_template('lab5/users.html', users=users)
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка загрузки пользователей: {e}")
+        return render_template('lab5/users.html', error="Ошибка загрузки списка пользователей")
+    
+@lab5.route('/lab5/profile', methods=['GET', 'POST'])
+def profile():
+    if 'login' not in session:
+        return redirect('/lab5/login')
+
+    login = session['login']
+    conn, cur = db_connect()
+    try:
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
+            cur.execute("SELECT id, name FROM users WHERE login = %s;", (login,))
+        else:
+            cur.execute("SELECT id, name FROM users WHERE login = ?;", (login,))
+        user = cur.fetchone()
+        if not user:
+            db_close(conn, cur)
+            return redirect('/lab5/login')
+
+        if request.method == 'GET':
+            db_close(conn, cur)
+            return render_template('lab5/profile.html', user=user)
+
+        new_name = request.form.get('name', '').strip()
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if new_name != '':
+            if db_type == 'postgres':
+                cur.execute("UPDATE users SET name = %s WHERE id = %s;", (new_name, user['id']))
+            else:
+                cur.execute("UPDATE users SET name = ? WHERE id = ?;", (new_name, user['id']))
+
+        if old_password or new_password or confirm_password:
+            if not old_password:
+                db_close(conn, cur)
+                return render_template('lab5/profile.html', user=user, error="Введите текущий пароль")
+            if not new_password or not confirm_password:
+                db_close(conn, cur)
+                return render_template('lab5/profile.html', user=user, error="Введите новый пароль и подтверждение")
+            if new_password != confirm_password:
+                db_close(conn, cur)
+                return render_template('lab5/profile.html', user=user, error="Пароли не совпадают")
+
+            if db_type == 'postgres':
+                cur.execute("SELECT password FROM users WHERE id = %s;", (user['id'],))
+            else:
+                cur.execute("SELECT password FROM users WHERE id = ?;", (user['id'],))
+            stored_hash = cur.fetchone()['password']
+            if not check_password_hash(stored_hash, old_password):
+                db_close(conn, cur)
+                return render_template('lab5/profile.html', user=user, error="Неверный текущий пароль")
+
+            new_hash = generate_password_hash(new_password)
+            if db_type == 'postgres':
+                cur.execute("UPDATE users SET password = %s WHERE id = %s;", (new_hash, user['id']))
+            else:
+                cur.execute("UPDATE users SET password = ? WHERE id = ?;", (new_hash, user['id']))
+
+        db_close(conn, cur)
+        return render_template('lab5/profile.html', user=user, success="Данные успешно обновлены")
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка обновления профиля: {e}")
+        return render_template('lab5/profile.html', user=user, error="Ошибка при сохранении")
+    
+@lab5.route('/lab5/public')
+def public_articles():
+    conn, cur = db_connect()
+    try:
+        db_type = os.environ.get('DB_TYPE', 'postgres')
+        if db_type == 'postgres':
+            cur.execute("""
+                SELECT a.title, a.article_text, u.login 
+                FROM articles a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.is_public = TRUE
+                ORDER BY a.id DESC;
+            """)
+        else:
+            cur.execute("""
+                SELECT a.title, a.article_text, u.login 
+                FROM articles a
+                JOIN users u ON a.user_id = u.id
+                WHERE a.is_public = 1
+                ORDER BY a.id DESC;
+            """)
+        articles = cur.fetchall()
+        db_close(conn, cur)
+        return render_template('lab5/public_articles.html', articles=articles)
+    except Exception as e:
+        db_close(conn, cur)
+        print(f"Ошибка загрузки публичных статей: {e}")
+        return render_template('lab5/public_articles.html', error="Ошибка загрузки")

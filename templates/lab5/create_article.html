@@ -10,21 +10,29 @@
         </div>
     {% endif %}
 
-    <form action="/lab5/create" method="post">
-        <div style="margin-bottom: 15px;">
-            <label>
-                Заголовок:<br>
-                <input type="text" name="title" value="{{ request.form.title or '' }}" style="width: 100%; padding: 8px;">
-            </label>
-        </div>
-        <div style="margin-bottom: 15px;">
-            <label>
-                Текст статьи:<br>
-                <textarea name="article_text" rows="10" style="width: 100%; padding: 8px;">{{ request.form.article_text or '' }}</textarea>
-            </label>
-        </div>
-        <button type="submit">Создать статью</button>
-    </form>
+        <form method="post">
+            <p>
+                <label>Заголовок:<br>
+                    <input type="text" name="title" value="{{ request.form.title or '' }}" required style="width:100%; padding:8px;">
+                </label>
+            </p>
+            <p>
+                <label>Текст статьи:<br>
+                    <textarea name="article_text" required rows="10" style="width:100%; padding:8px;">{{ request.form.article_text or '' }}</textarea>
+                </label>
+            </p>
+            <p>
+                <label>
+                    <input type="checkbox" name="is_favorite" value="1"> Добавить в избранное
+                </label>
+            </p>
+            <p>
+                <label>
+                    <input type="checkbox" name="is_public" value="1"> Сделать публичной
+                </label>
+            </p>
+            <button type="submit">Создать статью</button>
+        </form>
 
     <p><a href="/lab5">← Вернуться в базу знаний</a></p>
 {% endblock %}

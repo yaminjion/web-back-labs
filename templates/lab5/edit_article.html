@@ -1,23 +1,32 @@
 {% extends "base.html" %}
 {% block lab %}Редактирование статьи{% endblock %}
-
 {% block main %}
-<h2>Редактировать статью</h2>
+<h1>Редактировать статью</h1>
 <form method="post">
     <p>
-        <label><b>Название статьи:</b></label><br>
-        <input type="text" name="title" value="{{ article.title }}" required
-               style="width: 100%; padding: 8px; margin: 5px 0;">
+        <label>Заголовок:<br>
+            <input type="text" name="title" value="{{ article.title }}" required style="width:100%; padding:8px;">
+        </label>
     </p>
     <p>
-        <label><b>Текст статьи:</b></label><br>
-        <textarea name="article_text" rows="10" required
-                  style="width: 100%; padding: 8px; margin: 5px 0;">{{ article.article_text }}</textarea>
+        <label>Текст статьи:<br>
+            <textarea name="article_text" required rows="10" style="width:100%; padding:8px;">{{ article.article_text }}</textarea>
+        </label>
+    </p>
+    <p>
+        <label>
+            <input type="checkbox" name="is_favorite" value="1" {% if article.is_favorite %}checked{% endif %}> В избранное
+        </label>
+    </p>
+    <p>
+        <label>
+            <input type="checkbox" name="is_public" value="1" {% if article.is_public %}checked{% endif %}> Публичная
+        </label>
     </p>
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <p style="color:red;">{{ error }}</p>
     {% endif %}
-    <button type="submit" style="padding: 8px 16px; margin-top: 10px;">Сохранить</button>
-    <a href="{{ url_for('lab5.list_articles') }}" style="display: inline-block; margin-left: 10px;">← Отмена</a>
+    <button type="submit">Сохранить</button>
 </form>
+<a href="{{ url_for('lab5.list_articles') }}">← Отмена</a>
 {% endblock %}

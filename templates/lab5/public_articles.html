@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block lab %}Публичные статьи{% endblock %}
+
+{% block main %}
+<h1>Публичные статьи</h1>
+
+{% if articles %}
+    {% for art in articles %}
+        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+            <h3>{{ art.title or '[Без названия]' }}</h3>
+            <p style="white-space: pre-line;">{{ art.article_text }}</p>
+            <p style="font-size: 12px; color: #666;">Автор: {{ art.login }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Нет публичных статей.</p>
+{% endif %}
+
+<p><a href="{{ url_for('lab5.lab') }}">← Назад</a></p>
+{% endblock %}

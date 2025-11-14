@@ -51,12 +51,22 @@
 
 <div class="nav-container">
     <div class="nav-buttons">
-        <button onclick="location.href='/lab5/login'">Войти</button>
-        <button onclick="location.href='/lab5/register'">Регистрация</button>
-        <button onclick="location.href='/lab5/list'">Список статей</button>
-        <button onclick="location.href='/lab5/create'">Создать статью</button>
         {% if session.login %}
-            <button onclick="location.href='{{ url_for('lab5.logout') }}'">Выйти</button>
+
+            <button onclick="location.href='/lab5/login'">Войти</button>
+            <button onclick="location.href='/lab5/register'">Регистрация</button>                       
+            <button onclick="location.href='/lab5/list'">Список статей</button>
+            <button onclick="location.href='/lab5/create'">Создать статью</button>
+            <button onclick="location.href='/lab5/profile'">Профиль</button>
+            <button onclick="location.href='/lab5/public'">Публичные</button>   
+            <button onclick="location.href='{{ url_for('lab5.logout') }}'">Выйти</button>                  
+        {% else %}
+            <button onclick="location.href='/lab5/login'">Войти</button>
+            <button onclick="location.href='/lab5/register'">Регистрация</button>                       
+            <button onclick="location.href='/lab5/list'">Список статей</button>
+            <button onclick="location.href='/lab5/create'">Создать статью</button>
+            <button onclick="location.href='/lab5/profile'">Профиль</button>
+            <button onclick="location.href='/lab5/public'">Публичные</button>  
         {% endif %}
     </div>
     <div class="user-info">

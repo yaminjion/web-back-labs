@@ -23,6 +23,11 @@
                 Пароль: <input type="password" name="password">
             </label>
         </div>
+        <div>
+            <label>
+                Имя: <input type="text" name="name" value="{{ request.form.name or '' }}" required>
+            </label>
+        </div>
         <button type="submit">Зарегистрироваться</button>
     </form>
 {% endblock %}
