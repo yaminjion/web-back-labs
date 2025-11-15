@@ -6,6 +6,7 @@
 {% block content %}
 <h1>Список кабинетов</h1>
 <ul id="office-list"></ul>
+<p id="total-cost">Общая стоимость вашей аренды: 0 ₽</p>
 {% endblock %}
 
 {% block script %}
@@ -27,26 +28,46 @@
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('office-list');
+            const totalEl = document.getElementById('total-cost');
             list.innerHTML = '';
+            let total = 0;
+            const login = '{{ session.get("login") or "" }}';
+
             data.result.forEach(office => {
                 const li = document.createElement('li');
+                let text = `Кабинет №${office.number} — Стоимость: ${office.price} ₽`;
                 if (office.tenant) {
-                    li.textContent = `Кабинет №${office.number} — Арендатор: ${office.tenant}`;
-                    const btn = document.createElement('button');
-                    btn.textContent = 'Освободить';
-                    btn.onclick = () => cancellation(office.number);
-                    li.appendChild(document.createTextNode(' '));
-                    li.appendChild(btn);
+                    text += ` — Арендатор: ${office.tenant}`;
+                    if (office.tenant === login) {
+                        total += office.price;
+                    }
                 } else {
-                    li.textContent = `Кабинет №${office.number} — Свободен`;
-                    const btn = document.createElement('button');
-                    btn.textContent = 'Забронировать';
-                    btn.onclick = () => booking(office.number);
-                    li.appendChild(document.createTextNode(' '));
-                    li.appendChild(btn);
+                    text += ' — Свободен';
                 }
+                li.textContent = text;
+
+                if (login) {
+                    if (office.tenant === login) {
+                        const btn = document.createElement('button');
+                        btn.textContent = 'Освободить';
+                        btn.onclick = () => cancellation(office.number);
+                        li.appendChild(document.createTextNode(' '));
+                        li.appendChild(btn);
+                    } else if (!office.tenant) {
+                        const btn = document.createElement('button');
+                        btn.textContent = 'Забронировать';
+                        btn.onclick = () => booking(office.number);
+                        li.appendChild(document.createTextNode(' '));
+                        li.appendChild(btn);
+                    }
+                }
+
                 list.appendChild(li);
             });
+
+            if (totalEl) {
+                totalEl.textContent = `Общая стоимость вашей аренды: ${total} ₽`;
+            }
         })
         .catch(err => {
             console.error('Ошибка загрузки списка кабинетов:', err);

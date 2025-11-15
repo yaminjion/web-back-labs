@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, session, render_template
 
 lab6 = Blueprint('lab6', __name__, template_folder='templates')
 
-offices = [{"number": i, "tenant": None} for i in range(1, 11)]
+offices = [{"number": i, "tenant": None, "price": 1000 + i * 200} for i in range(1, 11)]
 
 @lab6.route('/lab6/')
 def lab6_main():
