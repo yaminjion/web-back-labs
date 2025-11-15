@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа №6{% endblock %}
+{% block lab_title %}Лабораторная работа №6{% endblock %}
+
+{% block content %}
+<h1>Список кабинетов</h1>
+<ul id="office-list"></ul>
+{% endblock %}
+
+{% block script %}
+<script>
+    function fetchOffices() {
+        const url = '/lab6/json-rpc-api/';
+        const id = Math.floor(Math.random() * 1000);
+        const payload = {
+            jsonrpc: "2.0",
+            method: "info",
+            id: id
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const list = document.getElementById('office-list');
+            list.innerHTML = '';
+            data.result.forEach(office => {
+                const li = document.createElement('li');
+                if (office.tenant) {
+                    li.textContent = `Кабинет №${office.number} — Арендатор: ${office.tenant}`;
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Освободить';
+                    btn.onclick = () => cancellation(office.number);
+                    li.appendChild(document.createTextNode(' '));
+                    li.appendChild(btn);
+                } else {
+                    li.textContent = `Кабинет №${office.number} — Свободен`;
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Забронировать';
+                    btn.onclick = () => booking(office.number);
+                    li.appendChild(document.createTextNode(' '));
+                    li.appendChild(btn);
+                }
+                list.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error('Ошибка загрузки списка кабинетов:', err);
+        });
+    }
+
+    function booking(officeNumber) {
+        const url = '/lab6/json-rpc-api/';
+        const id = Math.floor(Math.random() * 1000);
+        const payload = {
+            jsonrpc: "2.0",
+            method: "booking",
+            params: officeNumber,
+            id: id
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                switch (data.error.code) {
+                    case 1:
+                        alert('Ошибка: Пользователь не авторизован');
+                        break;
+                    case 2:
+                        alert('Ошибка: Офис уже занят');
+                        break;
+                    default:
+                        alert('Ошибка: ' + data.error.message);
+                }
+            } else {
+                fetchOffices();
+            }
+        })
+        .catch(err => {
+            console.error('Ошибка при бронировании:', err);
+        });
+    }
+
+    function cancellation(officeNumber) {
+        const url = '/lab6/json-rpc-api/';
+        const id = Math.floor(Math.random() * 1000);
+        const payload = {
+            jsonrpc: "2.0",
+            method: "cancellation",
+            params: officeNumber,
+            id: id
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.error) {
+                fetchOffices();
+            }
+
+        })
+        .catch(err => {
+            console.error('Ошибка при освобождении:', err);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchOffices);
+</script>
+{% endblock %}
