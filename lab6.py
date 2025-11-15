@@ -45,7 +45,6 @@ def api():
                     'result': 'success',
                     'id': req_id
                 })
-        # Неверный номер офиса
         return jsonify({
             'jsonrpc': '2.0',
             'error': {'code': -32602, 'message': 'Неверный номер офиса'},
@@ -53,9 +52,28 @@ def api():
         })
 
     elif method == 'cancellation':
+        if 'login' not in session:
+            return jsonify({
+                'jsonrpc': '2.0',
+                'error': {'code': 1, 'message': 'Пользователь не авторизован'},
+                'id': req_id
+            })
+
         office_number = params
         for office in offices:
             if office['number'] == office_number:
+                if office['tenant'] is None:
+                    return jsonify({
+                        'jsonrpc': '2.0',
+                        'error': {'code': 3, 'message': 'Офис не арендован'},
+                        'id': req_id
+                    })
+                if office['tenant'] != session['login']:
+                    return jsonify({
+                        'jsonrpc': '2.0',
+                        'error': {'code': 4, 'message': 'Офис арендован другим пользователем'},
+                        'id': req_id
+                    })
                 office['tenant'] = None
                 return jsonify({
                     'jsonrpc': '2.0',
@@ -69,7 +87,6 @@ def api():
         })
 
     else:
-        # Метод не найден
         return jsonify({
             'jsonrpc': '2.0',
             'error': {'code': -32601, 'message': 'Метод не найден'},

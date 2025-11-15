@@ -107,10 +107,23 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (!data.error) {
+            if (data.error) {
+                switch (data.error.code) {
+                    case 1:
+                        alert('Ошибка: Пользователь не авторизован');
+                        break;
+                    case 3:
+                        alert('Ошибка: Офис не арендован');
+                        break;
+                    case 4:
+                        alert('Ошибка: Офис арендован другим пользователем');
+                        break;
+                    default:
+                        alert('Ошибка: ' + data.error.message);
+                }
+            } else {
                 fetchOffices();
             }
-
         })
         .catch(err => {
             console.error('Ошибка при освобождении:', err);
