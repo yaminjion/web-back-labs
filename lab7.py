@@ -66,6 +66,8 @@ def put_film(id):
     if id < 0 or id >= len(films):
         return {"error": "Фильм не найден"}, 404
     film_data = request.get_json()
+    if not film_data.get('description') or film_data['description'].strip() == '':
+        return {"description": "Заполните описание"}, 400
     films[id] = film_data
     return jsonify(films[id])
 
@@ -73,5 +75,7 @@ def put_film(id):
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film_data = request.get_json()
+    if not film_data.get('description') or film_data['description'].strip() == '':
+        return {"description": "Заполните описание"}, 400
     films.append(film_data)
     return jsonify({"id": len(films) - 1})
