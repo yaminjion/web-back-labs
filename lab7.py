@@ -48,7 +48,6 @@ def get_films():
 # REST API для получения конкретного фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['GET'])
 def get_film(id):
-    # Проверка, что ID в пределах списка
     if id < 0 or id >= len(films):
         return {"error": "Фильм не найден"}, 404
     return jsonify(films[id])
@@ -56,7 +55,6 @@ def get_film(id):
 # REST API для удаления фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
 def del_film(id):
-    # Проверка, что ID в пределах списка
     if id < 0 or id >= len(films):
         return {"error": "Фильм не найден"}, 404
     del films[id]
@@ -65,10 +63,15 @@ def del_film(id):
 # REST API для редактирования фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
 def put_film(id):
-    # Проверка, что ID в пределах списка
     if id < 0 or id >= len(films):
         return {"error": "Фильм не найден"}, 404
     film_data = request.get_json()
     films[id] = film_data
     return jsonify(films[id])
-    
+
+# REST API для добавления нового фильма
+@lab7.route('/lab7/rest-api/films/', methods=['POST'])
+def add_film():
+    film_data = request.get_json()
+    films.append(film_data)
+    return jsonify({"id": len(films) - 1})
