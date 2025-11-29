@@ -45,8 +45,23 @@ def main():
 def get_films():
     return jsonify(films)
 
+# REST API для получения конкретного фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['GET'])
 def get_film(id):
+    # Проверка, что ID в пределах списка
     if id < 0 or id >= len(films):
         return {"error": "Фильм не найден"}, 404
     return jsonify(films[id])
+
+# REST API для удаления фильма по ID
+@lab7.route('/lab7/rest-api/films/<int:id>', methods=['DELETE'])
+def del_film(id):
+    # Проверка, что ID в пределах списка
+    if id < 0 or id >= len(films):
+        return {"error": "Фильм не найден"}, 404
+    
+    # Удаляем фильм из списка
+    del films[id]
+    
+    # Возвращаем пустой ответ с кодом 204 No Content
+    return '', 204
