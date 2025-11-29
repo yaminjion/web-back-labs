@@ -4,6 +4,46 @@
 
 {% block script %}
 <script src="{{ url_for('static', filename='lab7/main.js') }}"></script>
+<style>
+    .modal {
+        display: none;
+        z-index: 100;
+        box-shadow: 3px 3px 5px black;
+        background: white;
+        width: 400px;
+        left: 50%;
+        top: 220px;
+        margin-left: -200px;
+        position: absolute;
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    .modal label {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .modal input, .modal textarea {
+        width: 100%;
+        padding: 5px;
+        margin-top: 5px;
+    }
+
+    .modal textarea {
+        height: 100px;
+        resize: vertical;
+    }
+
+    .modal button {
+        margin: 5px;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 12px;
+    }
+</style>
 {% endblock %}
 
 {% block main %}
@@ -23,6 +63,38 @@
 
 <div>
     <button onclick="addFilm()">Добавить фильм</button>
+</div>
+
+<!-- Модальное окно для добавления/редактирования фильма -->
+<div class="modal">
+    <input type="hidden" id="id">
+    
+    <label>
+        Название фильма на русском:
+        <input type="text" id="title_ru">
+    </label>
+
+    <label>
+        Название фильма на оригинальном языке 
+        <i>(если фильм русский, то оставьте пустым):</i>
+        <input type="text" id="title">
+    </label>
+
+    <label>
+        Год выпуска:
+        <input type="number" id="year">
+    </label>
+
+    <label>
+        Описание:
+        <textarea id="description"></textarea>
+        <div id="description_error" class="error-message"></div>
+    </label>
+
+    <div>
+        <button onclick="sendFilm()">ОК</button>
+        <button onclick="cancel()">Отмена</button>
+    </div>
 </div>
 
 <script>
