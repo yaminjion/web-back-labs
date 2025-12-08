@@ -5,43 +5,114 @@
 {% block script %}
 <script src="{{ url_for('static', filename='lab7/main.js') }}"></script>
 <style>
+    body {
+        background-color: #fff9f9; 
+        color: #4b3d4f; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+        color: #d4a5a5; 
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #f2e6eb;
+    }
+
+    th {
+        background-color: #f8e8ea; 
+        color: #8a6d75;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: #fdf6f8; 
+    }
+
+    button {
+        background-color: #f0d0da;
+        color: #664a57;
+        border: none;
+        padding: 6px 12px;
+        margin: 0 4px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+        background-color: #e6bfcf;
+        transform: translateY(-1px);
+    }
+
     .modal {
         display: none;
         z-index: 100;
-        box-shadow: 3px 3px 5px black;
-        background: white;
-        width: 400px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        background: #fef7fa; 
+        width: 420px;
         left: 50%;
-        top: 220px;
-        margin-left: -200px;
+        top: 200px;
+        margin-left: -210px;
         position: absolute;
-        padding: 20px;
-        border-radius: 5px;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid #f7dee7;
     }
 
     .modal label {
         display: block;
-        margin: 10px 0;
+        margin: 14px 0 6px 0;
+        color: #82626e;
+        font-weight: 500;
     }
 
     .modal input, .modal textarea {
         width: 100%;
-        padding: 5px;
+        padding: 8px;
         margin-top: 5px;
+        border: 1px solid #e3d0d6;
+        border-radius: 6px;
+        background-color: #fffdf6;
+        font-size: 14px;
+        box-sizing: border-box;
     }
 
     .modal textarea {
-        height: 100px;
+        height: 110px;
         resize: vertical;
     }
 
     .modal button {
-        margin: 5px;
+        margin-top: 16px;
+        padding: 8px 16px;
+        font-weight: 600;
     }
 
     .error-message {
-        color: red;
+        color: #c96b7f; 
         font-size: 12px;
+        margin-top: 4px;
+    }
+
+    div[onclick="addFilm()"] {
+        text-align: center;
+        margin-top: 20px;
     }
 </style>
 {% endblock %}
@@ -52,8 +123,8 @@
 <table>
     <thead>
         <tr>
+            <th> Русское название</th>
             <th>Оригинальное название</th>
-            <th>Русское название</th>
             <th>Год</th>
             <th>Действие</th>
         </tr>
@@ -69,7 +140,7 @@
 <div class="modal">
     <input type="hidden" id="id">
     
-    <label>
+   <label>
         Название фильма на русском:
         <input type="text" id="title_ru">
     </label>

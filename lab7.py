@@ -60,22 +60,75 @@ def del_film(id):
     del films[id]
     return '', 204
 
+# REST API для добавления нового фильма
+@lab7.route('/lab7/rest-api/films/', methods=['POST'])
+def add_film():
+    data = request.get_json()
+    
+    # Преобразуем все значения к строке
+    title_ru = str(data.get('title_ru', '')).strip()
+    description = str(data.get('description', '')).strip()
+    title = str(data.get('title', '')).strip()
+    
+    # ВАЖНО: если title пустое, используем title_ru
+    if not title:
+        title = title_ru
+    
+    # Проверяем обязательные поля
+    if not title_ru:
+        return {"title_ru": "Заполните русское название"}, 400
+    if not description:
+        return {"description": "Заполните описание"}, 400
+    
+    year = 0
+    try:
+        year = int(data.get('year', 0))
+    except (TypeError, ValueError):
+        pass
+    
+    new_film = {
+        "title": title,  # Здесь будет либо введенное title, либо title_ru
+        "title_ru": title_ru,
+        "year": year,
+        "description": description
+    }
+    
+    films.append(new_film)
+    return jsonify({"id": len(films) - 1}), 201
+
+
 # REST API для редактирования фильма по ID
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
 def put_film(id):
     if id < 0 or id >= len(films):
         return {"error": "Фильм не найден"}, 404
-    film_data = request.get_json()
-    if not film_data.get('description') or film_data['description'].strip() == '':
-        return {"description": "Заполните описание"}, 400
-    films[id] = film_data
-    return jsonify(films[id])
 
-# REST API для добавления нового фильма
-@lab7.route('/lab7/rest-api/films/', methods=['POST'])
-def add_film():
-    film_data = request.get_json()
-    if not film_data.get('description') or film_data['description'].strip() == '':
+    data = request.get_json()
+    if not isinstance(data, dict):
+        return {"error": "Неверный формат данных"}, 400
+
+    title_ru = str(data.get('title_ru', '')).strip()
+    description = str(data.get('description', '')).strip()
+    title = str(data.get('title', '')).strip()
+
+    if not title_ru:
+        return {"title_ru": "Заполните русское название"}, 400
+    if not description:
         return {"description": "Заполните описание"}, 400
-    films.append(film_data)
-    return jsonify({"id": len(films) - 1})
+
+    if not title:
+        title = title_ru
+
+    year = 0
+    try:
+        year = int(data.get('year', 0))
+    except (TypeError, ValueError):
+        pass
+
+    films[id] = {
+        "title": title,
+        "title_ru": title_ru,
+        "year": year,
+        "description": description
+    }
+    return jsonify(films[id])
