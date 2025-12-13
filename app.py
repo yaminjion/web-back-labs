@@ -1,6 +1,9 @@
 from flask import Flask, url_for, request, redirect, abort, render_template
 import datetime
 import os
+from pathlib import Path
+from os import path
+from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 load_dotenv()
 from collections import deque
@@ -12,6 +15,9 @@ from lab4 import lab4
 from lab5 import lab5
 from lab6 import lab6
 from lab7 import lab7
+from lab8 import lab8
+from db import db
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'Секретно-секретный секрет')
 app.config['DB_TYPE'] = os.getenv('DB_TYPE', 'postgres')
@@ -22,7 +28,27 @@ app.register_blueprint(lab4)
 app.register_blueprint(lab5)
 app.register_blueprint(lab6)
 app.register_blueprint(lab7)
+app.register_blueprint(lab8)
 count = 0
+
+if app.config['DB_TYPE'] == 'postgres':
+    db_name = 'lena_minko_orm'
+    db_user = 'lena_minko_orm'
+    db_password = 'l3na'
+    host_ip = '127.0.0.1'
+    host_port = 5432
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f'postgresql://{db_user}:{db_password}@{host_ip}:{host_port}/{db_name}'
+    )
+else:
+    dir_path = Path(__file__).parent
+    db_path = dir_path / 'lena_minko_orm.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+
+db.init_app(app)
+
+
+
 
 @app.route("/")
 
@@ -50,6 +76,7 @@ def index():
                     <li><a href="/lab5/">Пятая лабораторная</a></li>
                     <li><a href="/lab6/">Шестая лабораторная</a></li>
                     <li><a href="/lab7/">Седьмая лабораторная</a></li>
+                    <li><a href="/lab8/">Восьмая лабораторная</a></li>
                 </ul>
             </nav>
         </main>

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+<style>
+    .header-bar {
+        background-color: #d3d3d3;
+        padding: 10px 20px;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    .nav-container {
+        background-color: #f2b3c8;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 5px;
+    }
+    .nav-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .nav-buttons a {
+        text-decoration: none;
+    }
+    .nav-buttons button {
+        padding: 8px 16px;
+        border: 1px solid #888;
+        border-radius: 4px;
+        background-color: #ffffff;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    .nav-buttons button:hover {
+        background-color: #ebd5df;
+    }
+    h1 {
+        margin-top: 20px;
+        font-size: 24px;
+    }
+    .user-info {
+        font-weight: bold;
+        color: #333;
+    }
+</style>
+
+<div class="header-bar">
+    WEB-программирование, часть 2. Лабораторная работа 8<br>
+</div>
+
+<h1>База знаний</h1>
+
+<div class="nav-container">
+    <div class="nav-buttons">
+        <a href="/lab8/login"><button>Войти</button></a>
+        <a href="/lab8/register"><button>Регистрация</button></a>
+        <a href="/lab8/articles"><button>Список статей</button></a>
+        <a href="/lab8/create"><button>Создать статью</button></a>
+    </div>
+    <div class="user-info">
+        anonymous
+    </div>
+</div>
+{% endblock %}
