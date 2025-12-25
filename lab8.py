@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, current_app
+from flask import Blueprint, render_template, request, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from db import db
-from db.models import users, articles as Article  # ← сразу даём алиас, чтобы избежать коллизий
+from db.models import users, articles as Article
 from sqlalchemy import or_, func
 
 lab8 = Blueprint('lab8', __name__, template_folder='templates')
@@ -44,8 +44,7 @@ def login():
     
     login_str = request.form.get('login')
     password = request.form.get('password')
-    remember = bool(request.form.get('remember'))  # '1' → True
-    
+
     if not login_str or not password:
         return render_template('lab8/login.html', error="Заполните все поля")
     
@@ -53,7 +52,7 @@ def login():
     if not user or not check_password_hash(user.password, password):
         return render_template('lab8/login.html', error="Неверный логин или пароль")
     
-    login_user(user, remember=remember)
+    login_user(user)  
     return redirect('/lab8/')
 
 @lab8.route('/lab8/logout')
@@ -137,30 +136,25 @@ def search_articles():
     query = request.args.get('q', '').strip()
     if not query:
         return render_template('lab8/search.html', articles=[], query='')
-    
-
-    own = []
-    if current_user.is_authenticated:
-        own = Article.query.filter(
-            Article.user_id == current_user.id,
-            or_(
-                func.lower(Article.title).contains(query.lower()),
-                func.lower(Article.article_text).contains(query.lower())
-            )
-        )
 
     public = Article.query.filter(
         Article.is_public == True,
         or_(
-            func.lower(Article.title).contains(query.lower()),
-            func.lower(Article.article_text).contains(query.lower())
+            func.lower(Article.title).like(f"%{query.lower()}%"),
+            func.lower(Article.article_text).like(f"%{query.lower()}%")
         )
     )
-    
 
     if current_user.is_authenticated:
-        results = own.union(public).all()
+        own = Article.query.filter(
+            Article.user_id == current_user.id,
+            or_(
+                func.lower(Article.title).like(f"%{query.lower()}%"),
+                func.lower(Article.article_text).like(f"%{query.lower()}%")
+            )
+        )
+        results = public.union(own).all()
     else:
         results = public.all()
-    
+
     return render_template('lab8/search.html', articles=results, query=query)

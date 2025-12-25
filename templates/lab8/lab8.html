@@ -25,20 +25,24 @@
         text-decoration: none;
     }
     .nav-buttons button {
-        padding: 8px 16px;
-        border: 1px solid #888;
-        border-radius: 4px;
-        background-color: #ffffff;
+        background-color: #f0d0da;
+        color: #664a57;
+        border: none;
+        padding: 6px 12px;
+        margin: 0 4px;
+        border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s, transform 0.1s;
     }
     .nav-buttons button:hover {
-        background-color: #ebd5df;
+        background-color: #e6bfcf;
+        transform: translateY(-1px);
     }
     h1 {
         margin-top: 20px;
         font-size: 24px;
+        color: #d4a5a5;
     }
     .user-info {
         font-weight: bold;
@@ -62,6 +66,8 @@
             <a href="/lab8/login"><button>Войти</button></a>
             <a href="/lab8/register"><button>Регистрация</button></a>
         {% endif %}
+        <a href="/lab8/public"><button>Публичные</button></a>
+        <a href="/lab8/search"><button>Поиск</button></a>
     </div>
     <div class="user-info">
         {% if current_user.is_authenticated %}
