@@ -2,6 +2,24 @@
 {% block lab %}Мои статьи{% endblock %}
 
 {% block main %}
+<style>
+    button {
+        background-color: #f0d0da;
+        color: #664a57;
+        border: none;
+        padding: 6px 12px;
+        margin: 0 4px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s, transform 0.1s;
+    }
+    button:hover {
+        background-color: #e6bfcf;
+        transform: translateY(-1px);
+    }
+</style>
+
 <h1>Мои статьи</h1>
 
 {% if articles %}
@@ -21,9 +39,7 @@
                 <a href="/lab8/edit/{{ article.id }}"><button>Редактировать</button></a>
                 <form method="POST" action="/lab8/delete/{{ article.id }}" style="display:inline;"
                       onsubmit="return confirm('Удалить статью «{{ article.title }}»?')">
-                    <button type="submit" style="background: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 3px;">
-                        Удалить
-                    </button>
+                    <button type="submit">Удалить</button>
                 </form>
             </div>
         </div>
@@ -34,9 +50,9 @@
 {% endif %}
 
 <div style="margin-top: 20px;">
-    <a href="/lab8/create"><button> Создать статью</button></a>
-    <a href="/lab8/public"><button> Публичные статьи</button></a>
-    <a href="/lab8/search"><button> Поиск</button></a>
+    <a href="/lab8/create"><button>➕ Создать статью</button></a>
+    <a href="/lab8/public"><button>🌎 Публичные статьи</button></a>
+    <a href="/lab8/search"><button>🔍 Поиск</button></a>
 </div>
 
 <p><a href="/lab8/">← Назад</a></p>

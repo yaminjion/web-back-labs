@@ -137,24 +137,17 @@ def search_articles():
     if not query:
         return render_template('lab8/search.html', articles=[], query='')
 
-    public = Article.query.filter(
-        Article.is_public == True,
-        or_(
-            func.lower(Article.title).like(f"%{query.lower()}%"),
-            func.lower(Article.article_text).like(f"%{query.lower()}%")
-        )
-    )
+    public_articles = Article.query.filter_by(is_public=True).all()
+    results = [
+        a for a in public_articles
+        if query.lower() in a.title.lower() or query.lower() in a.article_text.lower()
+    ]
 
     if current_user.is_authenticated:
-        own = Article.query.filter(
-            Article.user_id == current_user.id,
-            or_(
-                func.lower(Article.title).like(f"%{query.lower()}%"),
-                func.lower(Article.article_text).like(f"%{query.lower()}%")
-            )
-        )
-        results = public.union(own).all()
-    else:
-        results = public.all()
+        own_articles = Article.query.filter_by(user_id=current_user.id).all()
+        for a in own_articles:
+            if query.lower() in a.title.lower() or query.lower() in a.article_text.lower():
+                if not any(x.id == a.id for x in results):
+                    results.append(a)
 
     return render_template('lab8/search.html', articles=results, query=query)
