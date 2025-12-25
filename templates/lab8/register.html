@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+<h1>Регистрация</h1>
+
+<form method="POST">
+    <p>
+        <label><b>Логин:</b></label><br>
+        <input type="text" name="login" value="{{ login or '' }}" required>
+    </p>
+    <p>
+        <label><b>Пароль:</b></label><br>
+        <input type="password" name="password" required>
+    </p>
+    <p>
+        <label><b>Повторите пароль:</b></label><br>
+        <input type="password" name="repeat_password" required>
+    </p>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <button type="submit">Зарегистрироваться</button>
+</form>
+
+<p><a href="/lab8/">← Назад</a></p>
+{% endblock %}
