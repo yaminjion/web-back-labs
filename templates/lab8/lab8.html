@@ -60,7 +60,11 @@
         <a href="/lab8/create"><button>Создать статью</button></a>
     </div>
     <div class="user-info">
-        anonymous
+        {% if current_user.is_authenticated %}
+            {{ current_user.login }}
+        {% else %}
+            anonymous
+        {% endif %}
     </div>
 </div>
 {% endblock %}
