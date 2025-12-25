@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block lab %}Публичные статьи{% endblock %}
+{% block main %}
+<h1>Публичные статьи</h1>
+{% if articles %}
+  <ul>
+  {% for a in articles %}
+    <li><strong>{{ a.title }}</strong><br>{{ a.article_text[:200] }}...</li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>Нет публичных статей.</p>
+{% endif %}
+<p><a href="/lab8/">← Назад</a></p>
+{% endblock %}
+

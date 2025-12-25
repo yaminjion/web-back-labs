@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+<h1>Мои статьи</h1>
+
+{% if articles %}
+    <ul style="list-style: none; padding: 0;">
+    {% for article in articles %}
+        <li style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #f9f9f9;">
+            <div>
+                <strong>{{ article.title }}</strong>
+                {% if article.is_favorite %}
+                    <span style="color: gold;">⭐</span>
+                {% endif %}
+                {% if article.is_public %}
+                    <span style="color: green;">🌍 Публичная</span>
+                {% endif %}
+            </div>
+            <div style="margin: 10px 0; color: #555;">
+                {{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}
+            </div>
+            <div>
+                👍 {{ article.likes }}
+            </div>
+            <div style="margin-top: 10px;">
+                <a href="/lab8/edit/{{ article.id }}"><button>Редактировать</button></a>
+                <form method="POST" action="/lab8/delete/{{ article.id }}" style="display:inline;" 
+                      onsubmit="return confirm('Вы уверены, что хотите удалить статью «{{ article.title }}»?')">
+                    <button type="submit" style="background-color: #d9534f; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                        Удалить
+                    </button>
+                </form>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас пока нет статей.</p>
+{% endif %}
+
+<div style="margin-top: 20px;">
+    <a href="/lab8/create"><button>➕ Создать статью</button></a>
+    <a href="/lab8/public"><button>🌎 Публичные статьи</button></a>
+    <a href="/lab8/search"><button>🔍 Поиск</button></a>
+</div>
+
+<p style="margin-top: 20px;"><a href="/lab8/">← Назад на главную</a></p>
+{% endblock %}
