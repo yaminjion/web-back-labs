@@ -1,16 +1,24 @@
 {% extends "base.html" %}
 {% block lab %}Публичные статьи{% endblock %}
+
 {% block main %}
 <h1>Публичные статьи</h1>
+
 {% if articles %}
-  <ul>
-  {% for a in articles %}
-    <li><strong>{{ a.title }}</strong><br>{{ a.article_text[:200] }}...</li>
-  {% endfor %}
-  </ul>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+    {% for a in articles %}
+        <div style="border: 1px solid #ccc; padding: 15px; border-radius: 5px; background: #f9f9f9;">
+            <div><strong>{{ a.title }}</strong></div>
+            <div style="margin: 10px 0; color: #555;">
+                {{ a.article_text[:200] }}{% if a.article_text|length > 200 %}...{% endif %}
+            </div>
+            <div>👍 {{ a.likes }}</div>
+        </div>
+    {% endfor %}
+    </div>
 {% else %}
-  <p>Нет публичных статей.</p>
+    <p>Нет публичных статей.</p>
 {% endif %}
+
 <p><a href="/lab8/">← Назад</a></p>
 {% endblock %}
-

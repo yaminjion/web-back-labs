@@ -1,10 +1,8 @@
-from flask import Blueprint, render_template, request, redirect
-from werkzeug.security import generate_password_hash
+from flask import Blueprint, render_template, request, redirect, current_app
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import login_user, logout_user, login_required, current_user
 from db import db
-from db.models import users, articles
-from werkzeug.security import check_password_hash
-from flask_login import login_required
-from flask_login import login_user, logout_user, login_required
+from db.models import users, articles as Article  # ← сразу даём алиас, чтобы избежать коллизий
 from sqlalchemy import or_, func
 
 lab8 = Blueprint('lab8', __name__, template_folder='templates')
@@ -23,30 +21,21 @@ def register():
     repeat_password = request.form.get('repeat_password')
     
     if not login or not password or not repeat_password:
-        return render_template('lab8/register.html', 
-                               error="Все поля обязательны", 
-                               login=login)
+        return render_template('lab8/register.html', error="Все поля обязательны", login=login)
     
     if password != repeat_password:
-        return render_template('lab8/register.html', 
-                               error="Пароли не совпадают", 
-                               login=login)
+        return render_template('lab8/register.html', error="Пароли не совпадают", login=login)
     
     if users.query.filter_by(login=login).first():
-        return render_template('lab8/register.html', 
-                               error="Такой логин уже существует", 
-                               login=login)
+        return render_template('lab8/register.html', error="Такой логин уже существует", login=login)
     
     hashed = generate_password_hash(password)
     new_user = users(login=login, password=hashed)
-    
     db.session.add(new_user)
     db.session.commit()
     
     login_user(new_user)
-    
     return redirect('/lab8/')
-
 
 @lab8.route('/lab8/login', methods=['GET', 'POST'])
 def login():
@@ -55,30 +44,28 @@ def login():
     
     login_str = request.form.get('login')
     password = request.form.get('password')
-    remember = bool(request.form.get('remember'))  
-
+    remember = bool(request.form.get('remember'))  # '1' → True
+    
     if not login_str or not password:
         return render_template('lab8/login.html', error="Заполните все поля")
     
     user = users.query.filter_by(login=login_str).first()
-    if not user:
-        return render_template('lab8/login.html', error="Пользователь не найден")
+    if not user or not check_password_hash(user.password, password):
+        return render_template('lab8/login.html', error="Неверный логин или пароль")
     
-    if not check_password_hash(user.password, password):
-        return render_template('lab8/login.html', error="Неверный пароль")
-    
-    login_user(user, remember=remember)  
+    login_user(user, remember=remember)
     return redirect('/lab8/')
-
-@lab8.route('/lab8/articles')
-@login_required
-def articles():
-    return "Список статей"
 
 @lab8.route('/lab8/logout')
 def logout():
     logout_user()
     return redirect('/lab8/')
+
+@lab8.route('/lab8/articles')
+@login_required
+def articles():
+    user_articles = Article.query.filter_by(user_id=current_user.id).all()
+    return render_template('lab8/articles.html', articles=user_articles)
 
 @lab8.route('/lab8/create', methods=['GET', 'POST'])
 @login_required
@@ -94,7 +81,7 @@ def create_article():
     if not title or not text:
         return render_template('lab8/create.html', error="Заголовок и текст обязательны")
     
-    new_article = articles(
+    new_article = Article(
         user_id=current_user.id,
         title=title,
         article_text=text,
@@ -109,7 +96,6 @@ def create_article():
 @lab8.route('/lab8/edit/<int:article_id>', methods=['GET', 'POST'])
 @login_required
 def edit_article(article_id):
-    from db.models import articles as Article
     article = Article.query.filter_by(id=article_id, user_id=current_user.id).first()
     if not article:
         return redirect('/lab8/articles')
@@ -129,14 +115,12 @@ def edit_article(article_id):
     article.article_text = text
     article.is_favorite = is_favorite
     article.is_public = is_public
-
     db.session.commit()
     return redirect('/lab8/articles')
 
 @lab8.route('/lab8/delete/<int:article_id>', methods=['POST'])
 @login_required
 def delete_article(article_id):
-    from db.models import articles as Article
     article = Article.query.filter_by(id=article_id, user_id=current_user.id).first()
     if article:
         db.session.delete(article)
@@ -145,30 +129,38 @@ def delete_article(article_id):
 
 @lab8.route('/lab8/public')
 def public_articles():
-    from db.models import articles as Article
     public_arts = Article.query.filter_by(is_public=True).all()
     return render_template('lab8/public.html', articles=public_arts)
 
 @lab8.route('/lab8/search')
 def search_articles():
     query = request.args.get('q', '').strip()
-    from db.models import articles as Article
-
     if not query:
         return render_template('lab8/search.html', articles=[], query='')
+    
 
-    own_articles = Article.query.filter(
-        Article.user_id == (current_user.id if current_user.is_authenticated else -1),
-        func.lower(Article.title).contains(query.lower()) |
-        func.lower(Article.article_text).contains(query.lower())
-    )
+    own = []
+    if current_user.is_authenticated:
+        own = Article.query.filter(
+            Article.user_id == current_user.id,
+            or_(
+                func.lower(Article.title).contains(query.lower()),
+                func.lower(Article.article_text).contains(query.lower())
+            )
+        )
 
-    public_articles = Article.query.filter(
+    public = Article.query.filter(
         Article.is_public == True,
-        func.lower(Article.title).contains(query.lower()) |
-        func.lower(Article.article_text).contains(query.lower())
+        or_(
+            func.lower(Article.title).contains(query.lower()),
+            func.lower(Article.article_text).contains(query.lower())
+        )
     )
+    
 
-    all_articles = own_articles.union(public_articles).all()
-
-    return render_template('lab8/search.html', articles=all_articles, query=query)
+    if current_user.is_authenticated:
+        results = own.union(public).all()
+    else:
+        results = public.all()
+    
+    return render_template('lab8/search.html', articles=results, query=query)
