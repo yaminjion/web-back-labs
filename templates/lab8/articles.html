@@ -36,10 +36,33 @@
             </div>
             <div>👍 {{ article.likes }}</div>
             <div style="margin-top: 10px;">
-                <a href="/lab8/edit/{{ article.id }}"><button>Редактировать</button></a>
+                <a href="/lab8/edit/{{ article.id }}">
+                    <button style="
+                        background-color: #d4edda;
+                        color: #155724;
+                        border: none;
+                        padding: 6px 12px;
+                        margin: 0 4px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: background-color 0.2s;
+                    ">Редактировать</button>
+                </a>
+                
                 <form method="POST" action="/lab8/delete/{{ article.id }}" style="display:inline;"
-                      onsubmit="return confirm('Удалить статью «{{ article.title }}»?')">
-                    <button type="submit">Удалить</button>
+                    onsubmit="return confirm('Удалить статью «{{ article.title }}»?')">
+                    <button type="submit" style="
+                        background-color: #f8d7da;
+                        color: #721c24;
+                        border: none;
+                        padding: 6px 12px;
+                        margin: 0 4px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: background-color 0.2s;
+                    ">Удалить</button>
                 </form>
             </div>
         </div>
@@ -50,9 +73,9 @@
 {% endif %}
 
 <div style="margin-top: 20px;">
-    <a href="/lab8/create"><button>➕ Создать статью</button></a>
-    <a href="/lab8/public"><button>🌎 Публичные статьи</button></a>
-    <a href="/lab8/search"><button>🔍 Поиск</button></a>
+    <a href="/lab8/create"><button>Создать статью</button></a>
+    <a href="/lab8/public"><button>Публичные статьи</button></a>
+    <a href="/lab8/search"><button>Поиск</button></a>
 </div>
 
 <p><a href="/lab8/">← Назад</a></p>
