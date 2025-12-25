@@ -1,5 +1,7 @@
 from flask import Flask, url_for, request, redirect, abort, render_template
 import datetime
+from flask_login import LoginManager
+from db.models import users
 import os
 from pathlib import Path
 from os import path
@@ -30,6 +32,14 @@ app.register_blueprint(lab6)
 app.register_blueprint(lab7)
 app.register_blueprint(lab8)
 count = 0
+
+login_manager = LoginManager()
+login_manager.login_view = 'lab8.login'  
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return users.query.get(int(user_id))
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'lena_minko_orm'
