@@ -1,9 +1,198 @@
+<!-- templates/lab9/index.html -->
+
 {% extends "base.html" %}
 
 {% block lab %}Лабораторная работа 9{% endblock %}
 
-{% block script %}{% endblock %}
+{% block lab_title %}Лабораторная работа 9{% endblock %}
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const boxes = document.querySelectorAll('.gift-box');
+    const remainingSpan = document.getElementById('remaining');
+
+    boxes.forEach(box => {
+        box.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            fetch('/lab9/open_box', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ index: index })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Создаём элемент для подарка
+                    const giftDiv = document.createElement('div');
+                    giftDiv.className = 'gift-popup';
+                    giftDiv.innerHTML = `
+                        <img src="/static/gifts/${data.gift_image}" alt="Подарок" class="gift-image">
+                        <p>${data.congratulation}</p>
+                    `;
+                    // Удаляем старый подарок, если есть
+                    const oldGift = this.querySelector('.gift-popup');
+                    if (oldGift) oldGift.remove();
+                    // Вставляем новый
+                    this.appendChild(giftDiv);
+
+                    // Меняем стиль коробки
+                    this.style.opacity = '0.4';
+                    this.style.pointerEvents = 'none';
+
+                    // Обновляем счётчик
+                    remainingSpan.textContent = data.remaining;
+                } else if (data.status === 'already_opened') {
+                    alert('Эта коробка уже открыта!');
+                } else if (data.status === 'limit_reached') {
+                    alert('Вы уже открыли 3 коробки. Больше нельзя!');
+                } else if (data.status === 'auth_required') {
+                    alert('Этот подарок доступен только авторизованным пользователям!');
+                }
+            });
+        });
+    });
+
+    // Кнопка "Дед Мороз"
+    const dedMorozBtn = document.getElementById('ded-moroz');
+    if (dedMorozBtn) {
+        dedMorozBtn.addEventListener('click', function() {
+            fetch('/lab9/reset_boxes', { method: 'POST' })
+                .then(() => location.reload());
+        });
+    }
+});
+</script>
+
+<style>
+/* Переопределяем стили body для новогоднего оформления */
+body {
+    background: linear-gradient(135deg, #0a3d1d, #1a5c2d) !important;
+    color: white !important;
+    font-family: "Times New Roman", serif !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+}
+
+/* Стиль для заголовка */
+h1 {
+    font-size: 2.5em;
+    margin: 20px 0 10px;
+    color: #ffcc00;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Стиль для текста "Осталось открыть" */
+#stats {
+    font-size: 1.2em;
+    color: #ffcc00;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Стиль для коробок */
+.gift-box {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.3s, opacity 0.3s;
+    z-index: 10;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #ffcc00;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(255,204,0,0.5);
+    /* Для надёжности — добавим padding */
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.gift-box:hover {
+    transform: scale(1.05) rotate(3deg);
+    z-index: 100;
+}
+
+.gift-box img {
+    width: 80px;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* Стиль для подарка внутри коробки */
+.gift-popup {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 200px;
+    text-align: center;
+    z-index: 200;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.gift-popup img {
+    width: 100px;
+    height: auto;
+    border: 2px solid #ffcc00;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.gift-popup p {
+    font-size: 0.9em;
+    color: #fff;
+    margin: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Стиль для кнопки Дед Мороз */
+#ded-moroz {
+    margin-top: 15px;
+    padding: 8px 15px;
+    background: #e53935;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#ded-moroz:hover {
+    background: #d32f2f;
+}
+</style>
+{% endblock %}
 
 {% block main %}
-    <h1>Поздравления</h1>
+    <div style="text-align: center; padding: 20px;">
+        <h1>🎄 С Новым Годом! 🎄</h1>
+        <div id="stats">
+            Осталось открыть: <span id="remaining">{{ remaining }}</span> коробок
+        </div>
+
+        {% for item in box_data %}
+            <div class="gift-box"
+                 style="left: {{ item.x }}px; top: {{ item.y }}px;"
+                 data-index="{{ item.index }}"
+                 {% if item.is_opened %}style="opacity: 0.4; pointer-events: none;"{% endif %}>
+                <img src="/static/boxes/{{ item.name }}" alt="Коробка">
+            </div>
+        {% endfor %}
+
+        {% if is_authenticated %}
+            <button id="ded-moroz">Дед Мороз — наполнить коробки!</button>
+        {% endif %}
+    </div>
 {% endblock %}
