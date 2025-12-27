@@ -36,21 +36,13 @@ app.register_blueprint(lab9)
 count = 0
 
 login_manager = LoginManager()
-login_manager.login_view = 'lab8.login'  
 login_manager.init_app(app)
+login_manager.login_view = 'lab9.login'  
 
 @login_manager.user_loader
 def load_user(user_id):
     return users.query.get(int(user_id))
 
-from flask_login import LoginManager
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "lab9.login"
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 if app.config['DB_TYPE'] == 'postgres':
     db_name = 'lena_minko_orm'
@@ -67,8 +59,6 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 
 db.init_app(app)
-
-
 
 
 @app.route("/")

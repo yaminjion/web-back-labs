@@ -1,5 +1,3 @@
-# lab9.py
-
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -9,6 +7,7 @@ import random
 
 lab9 = Blueprint('lab9', __name__)
 
+# Подарки
 BOXES = [f"у{i}.jpg" for i in range(1, 16)]
 GIFTS = [f"п{i}.jpg" for i in range(1, 16)]
 
@@ -30,7 +29,7 @@ CONGRATULATIONS = [
     "С Новым Годом! Пусть он будет самым лучшим!"
 ]
 
-PRIVATE_GIFT_INDICES = set(range(9, 14))
+PRIVATE_GIFT_INDICES = set(range(9, 14))  # п10–п14
 
 
 def generate_positions():
@@ -45,7 +44,6 @@ def generate_positions():
             y = random.randint(40, h - 100)
             too_close = False
             for p in positions:
-                # Проверяем, что p — это словарь
                 px = p['x'] if isinstance(p, dict) else p[0]
                 py = p['y'] if isinstance(p, dict) else p[1]
                 if (px - x)**2 + (py - y)**2 < min_dist**2:
@@ -60,6 +58,8 @@ def generate_positions():
     return positions
 
 
+# === АВТОРИЗАЦИЯ ===
+
 @lab9.route('/lab9/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -68,9 +68,12 @@ def login():
     password = request.form.get('password')
     if not login_val or not password:
         return render_template('lab9/login.html', error="Логин и пароль обязательны")
+    
     user = users.query.filter_by(login=login_val).first()
-    if not user or not check_password_hash(user.password_hash, password):
+    # Используем user.password (а не password_hash)
+    if not user or not check_password_hash(user.password, password):
         return render_template('lab9/login.html', error="Неверный логин или пароль")
+    
     login_user(user)
     return redirect('/lab9/')
 
@@ -90,10 +93,13 @@ def register():
         return render_template('lab9/register.html', error="Пароль ≥4 символов")
     if users.query.filter_by(login=login_val).first():
         return render_template('lab9/register.html', error="Логин занят")
+    
     hashed = generate_password_hash(password)
-    new_user = users(login=login_val, password_hash=hashed)
+    # Используем password (а не password_hash)
+    new_user = users(login=login_val, password=hashed)
     db.session.add(new_user)
     db.session.commit()
+    
     login_user(new_user)
     return redirect('/lab9/')
 
@@ -105,28 +111,27 @@ def logout():
     return redirect('/lab9/')
 
 
+# === ПОДАРКИ ===
+
 @lab9.route('/lab9/')
 def main():
-    # Обработка opened_boxes
     raw_opened = session.get('opened_boxes', {})
     if isinstance(raw_opened, list):
         opened = {str(i): True for i in raw_opened}
     else:
         opened = raw_opened if isinstance(raw_opened, dict) else {}
 
-    # Обработка box_positions — поддержка старого формата (кортежи)
     raw_positions = session.get('box_positions')
     if raw_positions is None:
         positions = generate_positions()
         session['box_positions'] = positions
     else:
-        # Преобразуем старые кортежи в словари, если нужно
         positions = []
         for p in raw_positions:
             if isinstance(p, (list, tuple)):
                 positions.append({'x': p[0], 'y': p[1]})
             else:
-                positions.append(p)  # уже словарь
+                positions.append(p)
 
     boxes_data = []
     for i in range(15):
@@ -143,7 +148,7 @@ def main():
     is_authenticated = current_user.is_authenticated
 
     session['opened_boxes'] = opened
-    session['box_positions'] = positions  # сохраняем как список словарей
+    session['box_positions'] = positions
     session.modified = True
 
     return render_template(
@@ -188,7 +193,7 @@ def open_box():
     session['opened_boxes'] = opened
     session.modified = True
 
-    return jsonify({  # ← ИСПРАВЛЕНО: было 'retur'
+    return jsonify({
         'success': True,
         'congratulation': CONGRATULATIONS[box_id],
         'gift_image': GIFTS[box_id],
