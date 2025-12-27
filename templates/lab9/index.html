@@ -1,37 +1,55 @@
+<!-- templates/lab9/index.html -->
 {% extends "lab9_base.html" %}
 {% block title %}Новогодние подарки{% endblock %}
-{% block lab_title %}Новогодние подарки{% endblock %}
+{% block lab_title %}Новогодние подарки {% endblock %}
 
 {% block main %}
-<h1 style="text-align: center; color: #ffcc00;">🎄 Новогодние Подарки 🎄</h1>
+<div style="text-align: center; margin-bottom: 20px;">
+    <h1 style="color: #ffcc00; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+        ☆*:.｡.o(≧▽≦)o.｡.:*☆ Новогодние Подарки ☆*:.｡.o(≧▽≦)o.｡.:*☆
+    </h1>
+    <p style="margin: 10px 0; color: #ffd740;">
+        (◕‿◕)♡ Выберите до 3 коробок! Премиум-подарки помечены 
+    </p>
+</div>
 
-<div style="display: flex; justify-content: center; gap: 40px; margin: 20px 0; color: #ffcc00;">
+<div style="display: flex; justify-content: center; gap: 40px; margin: 20px 0; color: #ffcc00; font-weight: bold;">
     <div>Открыто: <strong id="opened-count">{{ opened_count }}</strong>/3</div>
     <div>Осталось: <strong id="remaining-count">{{ remaining_count }}</strong></div>
 </div>
 
-<div class="gifts-area" id="gifts-area" style="position: relative; height: 600px; background: rgba(255,255,255,0.05); border: 2px dashed #ffcc00; border-radius: 12px; margin: 20px 0;">
+<div class="gifts-area" id="gifts-area" style="position: relative; height: 620px; background: rgba(255,255,255,0.05); border: 2px dashed #ffcc00; border-radius: 15px; margin: 20px 0; overflow: hidden;">
     {% for box in boxes_data %}
     <div class="gift-box {% if box.is_opened %}opened{% endif %}"
          data-id="{{ box.id }}"
-         style="position: absolute; left: {{ box.x }}px; top: {{ box.y }}px; width: 100px; height: 100px; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+         style="position: absolute; left: {{ box.x }}px; top: {{ box.y }}px; width: 100px; height: 100px; cursor: pointer; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(255,204,0,0.5); transition: transform 0.3s;">
+        {% if box.id >= 9 and box.id <= 13 and not box.is_opened %}
+            <div style="position: absolute; top: -8px; right: -8px; background: #ffcc00; color: #0a3d1d; font-weight: bold; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                
+            </div>
+        {% endif %}
         {% if not box.is_opened %}
-            <img src="/static/boxes/{{ box.image }}" style="width:100%; height:100%; object-fit:cover;">
+            <img src="/static/boxes/{{ box.image }}" style="width:100%; height:100%; object-fit: cover;">
         {% else %}
-            <img src="/static/gifts/{{ gifts[box.id] }}" style="width:100%; height:100%; object-fit:cover;">
+            <img src="/static/gifts/{{ gifts[box.id] }}" style="width:100%; height:100%; object-fit: cover;">
         {% endif %}
     </div>
     {% endfor %}
 </div>
 
-<div id="message" style="text-align: center; margin: 20px 0; min-height: 24px; color: #ffcc00; font-weight: bold;"></div>
+<div id="message" style="text-align: center; margin: 20px 0; min-height: 26px; color: #ffcc00; font-weight: bold; font-size: 1.1em;"></div>
 
 {% if is_authenticated %}
-    <button id="ded-moroz" style="display: block; margin: 20px auto; padding: 10px 20px; background: #d32f2f; color: white; border: none; border-radius: 6px; font-weight: bold;">Дед Мороз — наполнить коробки!</button>
-    <p style="text-align: center;">Привет, <strong>{{ current_user.login }}</strong>! <a href="/lab9/logout">Выйти</a></p>
+    <button id="ded-moroz" style="display: block; margin: 20px auto; padding: 12px 24px; background: #d32f2f; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.3s, transform 0.2s;">
+        Дед Мороз — наполнить коробки! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+    </button>
+    <p style="text-align: center; margin-top: 10px;">
+        Привет, <strong>{{ current_user.login }}</strong>! <a href="/lab9/logout" style="color: #ff6b6b;">Выйти</a>
+    </p>
 {% else %}
-    <p style="text-align: center;">
-        <a href="/lab9/login">Войдите</a> или <a href="/lab9/register">зарегистрируйтесь</a>, чтобы получить приватные подарки!
+    <p style="text-align: center; margin-top: 15px; font-size: 1.1em;">
+        <a href="/lab9/login">Войдите</a> или <a href="/lab9/register">зарегистрируйтесь</a>,<br>
+        чтобы получить доступ к премиум-подаркам! (✧ω✧)
     </p>
 {% endif %}
 
@@ -56,19 +74,25 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success) {
                 box.classList.add('opened');
                 box.innerHTML = `<img src="/static/gifts/${data.gift_image}" style="width:100%; height:100%; object-fit:cover;">`;
-                msg.textContent = data.congratulation;
+                msg.innerHTML = ` ${data.congratulation} (´• ω •\`) ♡`;
                 msg.style.color = '#4caf50';
                 opened.textContent = data.opened_count;
                 remaining.textContent = 15 - data.opened_count;
             } else {
-                msg.textContent = data.message;
+                msg.innerHTML = `${data.message} ╮(￣ω￣;)╭`;
                 msg.style.color = '#f44336';
             }
-            setTimeout(() => msg.textContent = '', 4000);
+            setTimeout(() => msg.innerHTML = '', 5000);
+        }).catch(() => {
+            msg.innerHTML = ' Ошибка соединения! \(★ω★)/';
+            msg.style.color = '#f44336';
+            setTimeout(() => msg.innerHTML = '', 5000);
         });
     });
 
     if (ded) {
+        ded.onmouseover = () => ded.style.background = '#b71c1c';
+        ded.onmouseout = () => ded.style.background = '#d32f2f';
         ded.onclick = () => {
             fetch('/lab9/reset_boxes', {method: 'POST'}).then(() => location.reload());
         };

@@ -1,4 +1,4 @@
-<!-- templates/lab9_base.html -->
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,12 +7,20 @@
     <title>{% block title %}Лабораторная работа 9{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
         body {
             background: linear-gradient(135deg, #0a3d1d, #1a5c2d);
             color: white;
             font-family: "Times New Roman", serif;
-            margin: 0;
-            padding: 0;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
         header {
@@ -22,19 +30,37 @@
             text-align: center;
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            flex-shrink: 0;
         }
         main {
+            flex: 1;
             max-width: 1200px;
             margin: 20px auto;
             padding: 0 20px;
+            width: 100%;
         }
         footer {
             background: #062a14;
             color: white;
             text-align: center;
             padding: 15px;
-            margin-top: 40px;
             font-size: 0.9em;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 8px 16px;
+            background: #d32f2f;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .back-link:hover {
+            background: #b71c1c;
+            transform: scale(1.05);
         }
         a { color: #ffcc00; text-decoration: underline; }
         a:hover { color: #ffd740; }
@@ -44,10 +70,9 @@
     <header>WEB-программирование, часть 2. {% block lab_title %}Лабораторная работа 9{% endblock %}</header>
     <main>
         {% block main %}{% endblock %}
-        <p style="text-align: center; margin-top: 30px;">
-            <a href="/lab9/">← К подаркам</a>
-        </p>
     </main>
-    <footer>&copy; Елена Минько, ФБИ-34, 3 курс, 2025</footer>
+    <footer>
+        &copy; Елена Минько, ФБИ-34, 3 курс, 2025<br>
+    </footer>
 </body>
 </html>
