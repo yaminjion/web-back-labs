@@ -1,198 +1,78 @@
-<!-- templates/lab9/index.html -->
+{% extends "lab9_base.html" %}
+{% block title %}Новогодние подарки{% endblock %}
+{% block lab_title %}Новогодние подарки{% endblock %}
 
-{% extends "base.html" %}
+{% block main %}
+<h1 style="text-align: center; color: #ffcc00;">🎄 Новогодние Подарки 🎄</h1>
 
-{% block lab %}Лабораторная работа 9{% endblock %}
+<div style="display: flex; justify-content: center; gap: 40px; margin: 20px 0; color: #ffcc00;">
+    <div>Открыто: <strong id="opened-count">{{ opened_count }}</strong>/3</div>
+    <div>Осталось: <strong id="remaining-count">{{ remaining_count }}</strong></div>
+</div>
 
-{% block lab_title %}Лабораторная работа 9{% endblock %}
+<div class="gifts-area" id="gifts-area" style="position: relative; height: 600px; background: rgba(255,255,255,0.05); border: 2px dashed #ffcc00; border-radius: 12px; margin: 20px 0;">
+    {% for box in boxes_data %}
+    <div class="gift-box {% if box.is_opened %}opened{% endif %}"
+         data-id="{{ box.id }}"
+         style="position: absolute; left: {{ box.x }}px; top: {{ box.y }}px; width: 100px; height: 100px; cursor: pointer; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+        {% if not box.is_opened %}
+            <img src="/static/boxes/{{ box.image }}" style="width:100%; height:100%; object-fit:cover;">
+        {% else %}
+            <img src="/static/gifts/{{ gifts[box.id] }}" style="width:100%; height:100%; object-fit:cover;">
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
 
-{% block script %}
+<div id="message" style="text-align: center; margin: 20px 0; min-height: 24px; color: #ffcc00; font-weight: bold;"></div>
+
+{% if is_authenticated %}
+    <button id="ded-moroz" style="display: block; margin: 20px auto; padding: 10px 20px; background: #d32f2f; color: white; border: none; border-radius: 6px; font-weight: bold;">Дед Мороз — наполнить коробки!</button>
+    <p style="text-align: center;">Привет, <strong>{{ current_user.login }}</strong>! <a href="/lab9/logout">Выйти</a></p>
+{% else %}
+    <p style="text-align: center;">
+        <a href="/lab9/login">Войдите</a> или <a href="/lab9/register">зарегистрируйтесь</a>, чтобы получить приватные подарки!
+    </p>
+{% endif %}
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const boxes = document.querySelectorAll('.gift-box');
-    const remainingSpan = document.getElementById('remaining');
+document.addEventListener('DOMContentLoaded', function () {
+    const area = document.getElementById('gifts-area');
+    const msg = document.getElementById('message');
+    const opened = document.getElementById('opened-count');
+    const remaining = document.getElementById('remaining-count');
+    const ded = document.getElementById('ded-moroz');
 
-    boxes.forEach(box => {
-        box.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            fetch('/lab9/open_box', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ index: index })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Создаём элемент для подарка
-                    const giftDiv = document.createElement('div');
-                    giftDiv.className = 'gift-popup';
-                    giftDiv.innerHTML = `
-                        <img src="/static/gifts/${data.gift_image}" alt="Подарок" class="gift-image">
-                        <p>${data.congratulation}</p>
-                    `;
-                    // Удаляем старый подарок, если есть
-                    const oldGift = this.querySelector('.gift-popup');
-                    if (oldGift) oldGift.remove();
-                    // Вставляем новый
-                    this.appendChild(giftDiv);
+    area.addEventListener('click', e => {
+        const box = e.target.closest('.gift-box');
+        if (!box || box.classList.contains('opened')) return;
+        const id = box.dataset.id;
 
-                    // Меняем стиль коробки
-                    this.style.opacity = '0.4';
-                    this.style.pointerEvents = 'none';
-
-                    // Обновляем счётчик
-                    remainingSpan.textContent = data.remaining;
-                } else if (data.status === 'already_opened') {
-                    alert('Эта коробка уже открыта!');
-                } else if (data.status === 'limit_reached') {
-                    alert('Вы уже открыли 3 коробки. Больше нельзя!');
-                } else if (data.status === 'auth_required') {
-                    alert('Этот подарок доступен только авторизованным пользователям!');
-                }
-            });
+        fetch('/lab9/open_box', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({box_id: id})
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                box.classList.add('opened');
+                box.innerHTML = `<img src="/static/gifts/${data.gift_image}" style="width:100%; height:100%; object-fit:cover;">`;
+                msg.textContent = data.congratulation;
+                msg.style.color = '#4caf50';
+                opened.textContent = data.opened_count;
+                remaining.textContent = 15 - data.opened_count;
+            } else {
+                msg.textContent = data.message;
+                msg.style.color = '#f44336';
+            }
+            setTimeout(() => msg.textContent = '', 4000);
         });
     });
 
-    // Кнопка "Дед Мороз"
-    const dedMorozBtn = document.getElementById('ded-moroz');
-    if (dedMorozBtn) {
-        dedMorozBtn.addEventListener('click', function() {
-            fetch('/lab9/reset_boxes', { method: 'POST' })
-                .then(() => location.reload());
-        });
+    if (ded) {
+        ded.onclick = () => {
+            fetch('/lab9/reset_boxes', {method: 'POST'}).then(() => location.reload());
+        };
     }
 });
 </script>
-
-<style>
-/* Переопределяем стили body для новогоднего оформления */
-body {
-    background: linear-gradient(135deg, #0a3d1d, #1a5c2d) !important;
-    color: white !important;
-    font-family: "Times New Roman", serif !important;
-    min-height: 100vh !important;
-    overflow-x: hidden !important;
-    position: relative !important;
-}
-
-/* Стиль для заголовка */
-h1 {
-    font-size: 2.5em;
-    margin: 20px 0 10px;
-    color: #ffcc00;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-/* Стиль для текста "Осталось открыть" */
-#stats {
-    font-size: 1.2em;
-    color: #ffcc00;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-/* Стиль для коробок */
-.gift-box {
-    position: absolute;
-    cursor: pointer;
-    transition: transform 0.3s, opacity 0.3s;
-    z-index: 10;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid #ffcc00;
-    border-radius: 8px;
-    background: white;
-    box-shadow: 0 4px 12px rgba(255,204,0,0.5);
-    /* Для надёжности — добавим padding */
-    padding: 5px;
-    box-sizing: border-box;
-}
-
-.gift-box:hover {
-    transform: scale(1.05) rotate(3deg);
-    z-index: 100;
-}
-
-.gift-box img {
-    width: 80px;
-    height: auto;
-    border-radius: 5px;
-}
-
-/* Стиль для подарка внутри коробки */
-.gift-popup {
-    position: absolute;
-    top: 110%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
-    padding: 15px;
-    border-radius: 8px;
-    max-width: 200px;
-    text-align: center;
-    z-index: 200;
-    animation: fadeIn 0.3s ease-in;
-}
-
-.gift-popup img {
-    width: 100px;
-    height: auto;
-    border: 2px solid #ffcc00;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-.gift-popup p {
-    font-size: 0.9em;
-    color: #fff;
-    margin: 0;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-/* Стиль для кнопки Дед Мороз */
-#ded-moroz {
-    margin-top: 15px;
-    padding: 8px 15px;
-    background: #e53935;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-#ded-moroz:hover {
-    background: #d32f2f;
-}
-</style>
-{% endblock %}
-
-{% block main %}
-    <div style="text-align: center; padding: 20px;">
-        <h1>🎄 С Новым Годом! 🎄</h1>
-        <div id="stats">
-            Осталось открыть: <span id="remaining">{{ remaining }}</span> коробок
-        </div>
-
-        {% for item in box_data %}
-            <div class="gift-box"
-                 style="left: {{ item.x }}px; top: {{ item.y }}px;"
-                 data-index="{{ item.index }}"
-                 {% if item.is_opened %}style="opacity: 0.4; pointer-events: none;"{% endif %}>
-                <img src="/static/boxes/{{ item.name }}" alt="Коробка">
-            </div>
-        {% endfor %}
-
-        {% if is_authenticated %}
-            <button id="ded-moroz">Дед Мороз — наполнить коробки!</button>
-        {% endif %}
-    </div>
 {% endblock %}

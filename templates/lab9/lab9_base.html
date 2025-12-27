@@ -1,0 +1,53 @@
+<!-- templates/lab9_base.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Лабораторная работа 9{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a3d1d, #1a5c2d);
+            color: white;
+            font-family: "Times New Roman", serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        header {
+            background: #062a14;
+            color: #ffcc00;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        footer {
+            background: #062a14;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+        a { color: #ffcc00; text-decoration: underline; }
+        a:hover { color: #ffd740; }
+    </style>
+</head>
+<body>
+    <header>WEB-программирование, часть 2. {% block lab_title %}Лабораторная работа 9{% endblock %}</header>
+    <main>
+        {% block main %}{% endblock %}
+        <p style="text-align: center; margin-top: 30px;">
+            <a href="/lab9/">← К подаркам</a>
+        </p>
+    </main>
+    <footer>&copy; Елена Минько, ФБИ-34, 3 курс, 2025</footer>
+</body>
+</html>
